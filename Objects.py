@@ -1,4 +1,4 @@
-from Rules import Rule,Commute,IntoProduct
+from Rules import Commute
 from Morphisms import Object,Morphism
 from itertools import product
 

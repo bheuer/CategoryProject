@@ -1,6 +1,9 @@
 from collections import defaultdict 
 from itertools import product
 from copy import deepcopy
+from networkx import *
+from networkx.algorithms.isomorphism.isomorph import is_isomorphic
+from Morphisms import AbstractMorphism
 
 class Rule(object):
     dynamic = False
@@ -30,6 +33,18 @@ class Rule(object):
         if self.definingData()==rule.definingData():
             return True
         return False
+    
+class Composition(Rule):
+    def __init__(self):
+        super(Composition,self).__init__()
+        self.subdiag = DiGraph
+        #A -> B -> C
+        self.subdiag.add_edge("A","B")
+        self.subdiag.add_edge("B","C")
+    def apply(self):
+        for D in self.diagram.isomorphicSubdiagrams(self.subdiag):
+            m1,m2 = tuple(D.morphilist())
+            if not m1 > m2: continue
             
     
 class Commute(Rule):
@@ -56,70 +71,55 @@ class Commute(Rule):
     def __repr__(self):
         return "Rule: {} commutes with {}.".format(self.morph1,self.morph2)
 
-class MorphiRule(Rule):
-    dynamic=True
-    def __init__(self,morph):
-        super(MorphiRule,self).__init__()
-        self.morph = morph
-    def definingData(self):
-        return [self.morph]
-    def __repr__(self):
-        return "{} is {}".format(self.morph,self.__class__.__name__)
-
-class Epim(MorphiRule):
-    def apply(self):
-        target = self.morph.target
+class Attribute(object):
+    dynamic = False
+    def __init__(self,subdiag):
+        self.diagram = None
         
-        for m1,m2 in self.diagram.iterSameTargetBySource(target,repeat=2):
-            if m1*self.morph==m2*self.morph:
-                yield Commute(m1,m2)
-
-class Mono(MorphiRule):
-    def apply(self):
-        source = self.morph.source
+        #check that the subdiagram is of the desired form
+        T = self.DiagTemplate()
+        if T is not None:
+            assert is_isomorphic(T,self.subdiag.UnderlyingGraph)
         
-        for m1,m2 in self.diagram.iterSameSourceByTarget(source,repeat=2):
-            if self.morph*m1==self.morph*m2:
-                yield Commute(m1,m2)
-
-class Isom(MorphiRule):
-    def apply(self):
-        source = self.morph.source
+        self.subdiag = subdiag
         
-        for m1,m2 in self.diagram.iterSameSourceByTarget(source,repeat=2):
-            if self.morph*m1==self.morph*m2:
-                yield Commute(m1,m2)
- 
-class Unique(Rule):
-    dynamic=True
-    def __init__(self,morph=None):
-        super(Unique,self).__init__()
-        self.morph = morph
+    def setDiagram(self,diagram):
+        self.diagram = diagram
+    
+    def DiagTemplate(self):
+        return None
     
     def apply(self):
-        for m in self.iterMorphisms():
-            if not m==self.morph and self.uniqueProperty(m):
-                yield Commute(m,self.morph)
-    
-    def uniqueProperty(self,m):
+        '''apply the rule and iterate conclusions'''
         raise NotImplementedError
     
-class IntoProduct(Unique):
-    def __init__(self,morph,*Family):
-        super(IntoProduct,self).__init__(morph)
-        self.projections = Family
+    def definingData(self):
+        return [val for key,val in vars(self).items() if key not in ("diagram","dynamic")]
     
-    def uniqueProperty(self,morph2):
-        morph1 = self.morph
-        if morph2.target == morph1.target and morph2.source == morph1.source:
-            return all(proj*morph1==proj*morph2 for proj in self.projections)
+    def __eq__(self,rule):
+        if type(self)!=type(rule): #tested: this does compare highest level type
+            return False
+        if self.definingData()==rule.definingData():
+            return True
+        return False
+
+class MorphismAttribute(Attribute):
+    def __init__(self,morphism):
+        assert isinstance(morphism,AbstractMorphism)
+        D = Diagram()
+        
+        
+        
+
+class Epim(Attribute):
     
-class FromCoproduct(Unique):
-    def __init__(self,morph,*Family):
-        super(FromCoproduct,self).__init__(morph)
-        self.injections = Family
+    def DiagTemplate():
+        #Morphism
+        G = DiGraph()
+        G.add_edge(1,2)
+        return G 
     
-    def uniqueProperty(self,morph2):
-        morph1 = self.morph
-        if morph2.target == morph1.target and morph2.source == morph1.source:
-            return all(morph1*inj==morph2*inj for inj in self.injections)
+    def apply
+    
+    
+    

@@ -1,7 +1,6 @@
 from collections import defaultdict 
 from itertools import product
 from copy import deepcopy
-from Rules import *
 
 class Object(object):
     def __init__(self,diagram = None,name = None):
@@ -115,6 +114,7 @@ class Morphism(AbstractMorphism):
         if self.Composition==[] and source==target:
             self.Composition=Identity(target)
         
+        
     def length(self):
         return len(self.Composition)
     
@@ -152,6 +152,7 @@ class Identity(Morphism):
         self.obj = o
         self.diagram = o.diagram
         self.Composition=[]
+        self.name = "id_"+self.obj.name
     def id(self):
         return (self.obj.name,)
     def compose(self,g):
