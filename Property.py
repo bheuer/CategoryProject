@@ -70,7 +70,9 @@ class MorphismsProperty(Property):
         return D
     def __repr__(self):
         print "edgeMap",self.homomorphism.edgeMap
-        print self.homomorphism.edgeMap.keys()
+        
+        hom1 = self.morph
+        hom2 = self.homomorphism.edgeMap.keys()[0]
         str_ = "Morphism Property {} for morphism {}".format(self.name,self.homomorphism.edgeMap[self.morph])
         return str_
         
@@ -105,7 +107,9 @@ if __name__ == "__main__":
     
     p = Product(f,g)
     zero = ZeroObject(A)
+    epi = Epimorphism(f)
     
     print p
     
     print zero
+    print epi

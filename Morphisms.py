@@ -32,27 +32,6 @@ class AbstractMorphism(object):
         assert isinstance(morph,AbstractMorphism)
         return self.target==morph.target and self.source==morph.source
     
-class AtomicMorphism(AbstractMorphism):
-    def __init__(self,source,target,name):
-        super(AtomicMorphism,self).__init__(source,target)
-        self.name = name
-        self.diagram.addMorphi(self)
-    
-    def __repr__(self):
-        return self.name
-    
-    def id(self):
-        return self.name
-    
-    def __eq__(self,morphi):
-        if not isinstance(morphi,AtomicMorphism):
-            return morphi==self
-        if morphi.name==self.name and morphi.target == self.target and morphi.source == self.source:
-            return True
-        return False
-    
-    def __neq__(self,morphi):
-        return not self==morphi
 
 def isWellDefined(ListOfMorphisms):
     n = len(ListOfMorphisms)
@@ -121,11 +100,13 @@ class Morphism(AbstractMorphism):
     def id(self):
         return tuple([m.name for m in self.Composition])
     
+    def __hash__(self):
+        return hash(self.id())
+    
     def __eq__(self,morphi):
         
         if not isinstance(morphi,Morphism):
             raise ValueError
-            morphi = Morphism(morphi)
         
         #technically the same thing
         if self.id() == morphi.id():
@@ -145,6 +126,31 @@ class Morphism(AbstractMorphism):
         s+=str(self.source)
         s+="".join(" -> "+str(c.target) for c in reversed(self.Composition))
         return s
+
+class AtomicMorphism(Morphism):
+    def __init__(self,source,target,name):
+        super(Morphism,self).__init__(source,target)
+        self.name = name
+        self.Composition = [self]
+        
+        self.diagram.addMorphi(self)
+        
+    
+    def __repr__(self):
+        return self.name
+    
+    def id(self):
+        return self.name
+    
+    def __eq__(self,morphi):
+        if not isinstance(morphi,AtomicMorphism):
+            return morphi==self
+        if morphi.name==self.name and morphi.target == self.target and morphi.source == self.source:
+            return True
+        return False
+    
+    def __neq__(self,morphi):
+        return not self==morphi
 
 class Identity(Morphism):
     def __init__(self,o):

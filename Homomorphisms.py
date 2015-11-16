@@ -3,7 +3,11 @@ from copy import deepcopy
 from collections import defaultdict
 
 class Homomorphism:
-    def __init__(self,D1,D2,nodeMap={},edgeMap={}):
+    def __init__(self,D1,D2,nodeMap=None,edgeMap=None):
+        if nodeMap is None:
+            nodeMap = {}
+        if edgeMap is None:
+            edgeMap = {}
         self.D1 = D1
         self.D2 = D2
         self.nodeMap = nodeMap
