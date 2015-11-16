@@ -1,22 +1,7 @@
 from collections import defaultdict 
 from itertools import product
 from copy import deepcopy
-
-class Object(object):
-    def __init__(self,diagram = None,name = None):
-        self.diagram = diagram
-        self.name = name
-        assert self.name not in self.diagram.UNIVERSE
-        if name is None:
-            self.name = diagram.giveName()
-        self.Identity = Identity(self)
-        
-        self.diagram.addObject(self)
-        
-    def __repr__(self):
-        return self.name
-    def __hash__(self):
-        return self.name.__hash__()
+from Object import Object
 
 class AbstractMorphism(object):
     def __init__(self, source, target):
@@ -76,30 +61,45 @@ def isWellDefined(ListOfMorphisms):
             return False
     return True
 
+def processInputMorphisms(args):
+    #takes different sorts of user input and makes it into 
+    #a list of morphisms that represent a (possibly composed) morphism
+    if len(args)==3 and isinstance(args[0],Object) and isinstance(args[1],Object) and isinstance(args[2],str):
+        args=[AtomicMorphism(*args)]
+        
+    if len(args)==0:
+        raise ValueError
+    
+    morphilist = []
+    for arg in args:
+        if isinstance(arg,AbstractMorphism):
+            morphilist.append(arg)
+    
+        elif isinstance(arg,list):
+            morphilist+=arg
+        
+    if not isWellDefined(morphilist):
+        msg = "List not welldefined: "+"".join(str(morphi.source)+"->"+str(morphi.target)+"  ," for morphi in morphilist)
+        raise ValueError,msg
+    return morphilist
+
 class Morphism(AbstractMorphism):
     def __init__(self, *args):
-        if len(args)==3 and isinstance(args[0],Object) and isinstance(args[1],Object) and isinstance(args[2],str):
-            args=[AtomicMorphism(*args)]
+        '''
+        Datastructure to represent Morphisms in a Diagram
+        user-friendliness: accept different sorts of input, namely:
+            1) Morphism(Object 1,Object 2,Name of Morphism)
+            2) Morphism([List of Morphisms])
+        '''
         
-        if len(args)==0:
-            raise ValueError
-        
-        morphilist = []
-        for arg in args:
-            if isinstance(arg,AbstractMorphism):
-                morphilist.append(arg)
-        
-            elif isinstance(arg,list):
-                morphilist+=arg
-            
-        if not isWellDefined(morphilist):
-            msg = "List not welldefined: "+"".join(str(morphi.source)+"->"+str(morphi.target)+"  ," for morphi in morphilist)
-            raise ValueError,msg
+        morphilist = processInputMorphisms(args)
         
         source = morphilist[-1].source
         target = morphilist[0].target
+        
         super(Morphism,self).__init__(source,target)
-
+        
+        #create list of constituting user-defined Morphisms
         self.Composition = []
         for morphi in morphilist:
             if isinstance(morphi,Identity):

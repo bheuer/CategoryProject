@@ -1,8 +1,10 @@
 from collections import defaultdict 
 from itertools import product
-from Morphisms import *
 from networkx import DiGraph
 from networkx.algorithms.isomorphism  import DiGraphMatcher,generic_edge_match
+from networkx import isolates
+from networkx.algorithms.isolate import is_isolate
+from Morphisms import Morphism
 
 class Diagram(object):
     def __init__(self):
@@ -14,7 +16,9 @@ class Diagram(object):
         self.Rules = []
         
         self.CommutingComponents = {}
-    
+        
+        self.MorphismList = []
+        
     def addObject(self,obj):
         self.Objects.append(obj)
         self.Graph.add_node(obj)
@@ -31,7 +35,10 @@ class Diagram(object):
             return
         
         self.addName(morph.name)
+        
         self.Morphisms[source][target].append(morph)
+        self.MorphismList.append(Morphism(morph))
+        
         self.Graph.add_edge(source,target,object = morph)
         
         self.CommutingComponents[morph.id()]=morph.id()
@@ -41,6 +48,12 @@ class Diagram(object):
         if name in self.UNIVERSE:
             raise ValueError,"name {} already given".format(name)
         self.UNIVERSE.add(name)
+    
+    def giveName(self):
+        i=0
+        while "o"+str(i) in self.UNIVERSE:
+            i+=1
+        return "o"+str(i)
     
     def unify(self,morph1,morph2):
         '''take two Morphisms and register that they should be considered equal'''
@@ -58,15 +71,6 @@ class Diagram(object):
         if not self.CommutingComponents.has_key(m_id1) or not self.CommutingComponents.has_key(m_id2):
             return False
         return self.CommutingComponents[m_id1]==self.CommutingComponents[m_id2]
-    
-    def giveName(self):
-        i=0
-        while "o"+str(i) in self.UNIVERSE:
-            i+=1
-        return "o"+str(i)
-    
-    def morphismlist(self):
-        return sum((i for i in D.Morphisms.values()),[])
     
     def iterateIsomorphicSubdiags(self,Subgraph,comp):
         #build all subgraphs of G which are isomorphic to Subgraph
@@ -92,12 +96,15 @@ class Diagram(object):
                 for source,target,morphi in morphis:
                     H.add_edge(source,target,object = morphi)
                 yield H,Mapping
-            
     
     def print_(self):
         for s in self.Objects:
             for t in self.Morphisms[s]:
                 for f in self.Morphisms[s][t]:
-                    if isinstance(f,Identity):
-                        continue
                     print f
+
+def isolatedNodes(diagram):
+    for o in diagram.Objects:
+        if is_isolate(diagram.Graph,o):
+            yield o
+    
