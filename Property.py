@@ -57,7 +57,7 @@ class Property:
         return (self.name,self.homomorphism.definingData())
     
     def __repr__(self):
-        str_ = "Property {} with homomorphism:\n".format(self.name)
+        str_ = "Property '{}' with homomorphism:\n".format(self.name)
         str_+=str(self.homomorphism)
         return str_
 
@@ -69,11 +69,7 @@ class MorphismsProperty(Property):
         self.morph = Morphism(A,B,"f")
         return D
     def __repr__(self):
-        print "edgeMap",self.homomorphism.edgeMap
-        
-        hom1 = self.morph
-        hom2 = self.homomorphism.edgeMap.keys()[0]
-        str_ = "Morphism Property {} for morphism {}".format(self.name,self.homomorphism.edgeMap[self.morph])
+        str_ = "Morphism Property '{}' for morphism {}".format(self.name,self.homomorphism.edgeMap[self.morph])
         return str_
         
 class Epimorphism(MorphismsProperty):
@@ -110,6 +106,5 @@ if __name__ == "__main__":
     epi = Epimorphism(f)
     
     print p
-    
     print zero
     print epi

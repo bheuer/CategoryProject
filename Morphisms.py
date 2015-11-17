@@ -139,8 +139,8 @@ class AtomicMorphism(Morphism):
     def __repr__(self):
         return self.name
     
-    def id(self):
-        return self.name
+    #def id(self):
+    #    return self.name
     
     def __eq__(self,morphi):
         if not isinstance(morphi,AtomicMorphism):
