@@ -1,16 +1,16 @@
 from collections import defaultdict 
 from itertools import product
-from networkx import DiGraph
+from networkx import MultiDiGraph
 from networkx.algorithms.isomorphism  import DiGraphMatcher,generic_edge_match
 from networkx import isolates
 from networkx.algorithms.isolate import is_isolate
-from Morphisms import Morphism
+from Morphisms import Morphism, AtomicMorphism
 
 class Diagram(object):
     def __init__(self):
         self.Objects = []
         self.Morphisms = {}
-        self.Graph = DiGraph()
+        self.Graph = MultiDiGraph()
         
         self.UNIVERSE = set([])
         self.Rules = []
@@ -36,10 +36,10 @@ class Diagram(object):
         
         self.addName(morph.name)
         
-        self.Morphisms[source][target].append(morph)
-        self.MorphismList.append(Morphism(morph))
-        
-        self.Graph.add_edge(source,target,object = morph)
+        Morph = Morphism(morph)
+        self.Morphisms[source][target].append(Morph)
+        self.MorphismList.append(Morph)
+        self.Graph.add_edge(source,target,object = Morph)
         
         self.CommutingComponents[morph.id()]=morph.id()
     
