@@ -24,7 +24,8 @@ class Homomorphism:
         self.edgeMap[edge]=image
         
     def copy(self):
-        return Homomorphism(self.D1,self.D2,deepcopy(self.nodeMap),deepcopy(self.edgeMap))
+        return Homomorphism(self.D1,self.D2,\
+                    copyDictWithoutCopyingEntries(self.nodeMap),copyDictWithoutCopyingEntries(self.edgeMap))
     
     def definingData(self):
         return (self.nodeMap,self.edgeMap)    
@@ -48,93 +49,14 @@ class Homomorphism:
         str_ = ""
         str_+= "Nodes:\n"
         for obj in self.D1.Objects:
-            str_+="  {} -> {}\n".format(obj, self.nodeMap[obj])
+            str_+="  {} -> {}\n".format(obj, self.nodeMap.get(obj))
         str_+="Edges:\n"
         for edge in self.D1.MorphismList:
-            str_+= "  {} -> ({})\n".format(edge,self.edgeMap[edge])
+            str_+= "  ({}) -> ({})\n".format(edge,self.edgeMap.get(edge))
         return str_
-    
-def doNodesMatch(node1,node2):
-    #return all(i in node2.properties for i in node1.properties)
-    for i in node1.properties:
-        if i not in node2.properties:
-            return False
-    return True
 
-def doEdgesMatch(edge1,edge2):
-    for i in edge1.properties:
-        if i not in edge2.properties:
-            return False
-    return True
-
-def pairUpEdge(self,neighbour1,outedge1,imageEdgeIterator):
-    for _,neighbour2,outedge2 in imageEdgeIterator:
-        if doNodesMatch(neighbour1, neighbour2) and doEdgesMatch(outedge1,outedge2):
-            yield neighbour1,neighbour2,outedge1,outedge2
-
-
-class HomomorphismIterator:
-    def __init__(self,D1,D2):
-        self.D1 = D1
-        self.D2 = D2
-        self.G1 = D1.Graph
-        self.G2 = D2.Graph
-        
-        raise NotImplementedError
-    
-    def initialize(self):
-        self.hom = Homomorphism(self.D1,self.D2)
-        self.nodesToDoList = self.G1.nodes()
-        
-    def __call__(self):
-        self.initialize()
-        
-        self.match()
-    
-    def match(self):
-        if self.nodesToDoList == []:
-            yield self.hom.copy()
-        
-        #match new connected Component
-        node1 = self.nodesToDoList.pop()
-        for node2 in self.G2.nodes():
-            if doNodesMatch(node1,node2):
-                #
-                self.matchNode(self,node1,node2)
-                self.match()
-            
-    
-    def imageEdgeIteratorOut(self,neighbour,outedge,image):
-        for _,image2,outedge2 in self.G2.out_edges([image],data = True):
-            if False:pass
-    
-    def imageEdgeIteratorIn(self,neighbour,outedge,image):
-        for _,image2,outedge2 in self.G2.in_edges([image],data = True):
-            if False:pass
-     
-    def neighbourhoodMatchIterator(self,node,image):
-        for _,neighbour,outedge in self.G1.out_edges([node],data = True):
-            imageEdgeIterator = self.imageEdgeIteratorOut()
-            yield self.pairUpEdge(neighbour,outedge,imageEdgeIterator)
-        for _,neighbour,outedge in self.G1.in_edges([node],data = True):
-            imageEdgeIterator = self.imageEdgeIteratorIn()
-            yield self.pairUpEdge(neighbour,outedge,imageEdgeIterator)
-            
-        
-    def matchNode(self,node,image):
-        
-        self.nodeMap[node] = image
-        
-        for matchings in product(self.neighbourhoodMatchIterator(node,image)):
-            for matching in matchings:
-                neighbour1,neighbour2,outedge1,outedge2 = matching
-                self.hom.set_node_image(neighbour1, neighbour2)
-                self.hom.set_edge_image(outedge1,  outedge2)
-            
-            for matching in matchings:
-                neighbour1,neighbour2,_,_ = matching
-                self.matchNode( neighbour1,neighbour2)
-        
+def copyDictWithoutCopyingEntries(dic):
+    return dict((key,value) for key,value in dic.items())
             
         
         
