@@ -17,7 +17,17 @@ class Homomorphism:
         return self.nodeMap[ind]
     def __setitem__(self,ind,val):
         self.nodeMap[ind] = val
-        
+    
+    def iterNodes(self):
+        for node in self.nodeMap:
+            image = self.nodeMap.get(node)
+            yield node,image
+    def iterEdges(self):
+        for edge in self.edgeMap:
+            image = self.edgeMap[edge]
+            yield edge,image
+    
+    
     def set_node_image(self,node,image):
         self.nodeMap[node]=image
     def set_edge_image(self,edge,image):

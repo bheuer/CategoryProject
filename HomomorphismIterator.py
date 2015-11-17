@@ -4,19 +4,11 @@ from networkx.algorithms.components.weakly_connected import weakly_connected_com
 from Diagram import Diagram,Morphism
 from Object import Object
 
-def doNodesMatch(node1,node2):
-    return True
-    return all(i in node2.properties for i in node1.properties)
-
-def doEdgesMatch(edge1,edge2):
-    return True
-    return all(i in edge1.properties for i in edge2.properties)
-
 def iterateEdges(G,node1,node2):
     dic = G[node1]
     if dic.has_key(node2):
         for K in dic[node2].values():
-            yield K["object"]
+            yield K["object"],K["propertyTags"]
 
 class HomomorphismIterator:
     def __init__(self,D1,D2):
@@ -38,6 +30,14 @@ class HomomorphismIterator:
         for _ in self.matchComponents():
             yield self.hom.copy()
     
+    def doNodesMatch(self,node1,node2):
+        P1 = self.G1.node[node1]["propertyTags"]
+        P2 = self.G2.node[node2]["propertyTags"]
+        return P1.issubset(P2)
+            
+    def doEdgesMatch(self,P1,P2):
+        return P1.issubset(P2)
+    
     def matchComponents(self,index = 0):
         if index==len(self.componentRepresentatives):
             yield
@@ -45,13 +45,14 @@ class HomomorphismIterator:
         
         node1 = self.componentRepresentatives[index]
         for node2 in self.G2.nodes():
-            if doNodesMatch(node1,node2):
-                self.hom.nodeMap[node1]=node2
-                for _ in self.matchNode(node1):
-                    for _ in self.matchComponents(index+1):
-                        yield None
-                
-                self.hom.nodeMap[node1]=None
+            if not self.doNodesMatch(node1,node2):
+                continue
+            self.hom.nodeMap[node1]=node2
+            for _ in self.matchNode(node1):
+                for _ in self.matchComponents(index+1):
+                    yield None
+            
+            self.hom.nodeMap[node1]=None
     
     def matchNode(self,node):
         neighbourlist = [n for n in all_neighbors(self.G1,node) if self.hom.nodeMap.get(n) is None]
@@ -73,12 +74,15 @@ class HomomorphismIterator:
         if index==len(edges):
             yield None
             return
-        node,neighbour,morphi = edges[index]
+        
+        node,neighbour,morphidata = edges[index]
         if mode=="in":
             node,neighbour = neighbour,node
-        morphi = morphi["object"]
-        
+            
         node2 = self.hom.nodeMap[node]
+        morphi = morphidata["object"]
+        properties = morphidata["propertyTags"]
+        
         
         neighbour2 = self.hom.nodeMap.get(neighbour)
         if neighbour2 is not None: #node assigned before
@@ -89,8 +93,8 @@ class HomomorphismIterator:
                 elif mode=="in":
                     iter_ = iterateEdges(self.G2,neighbour2,node2)
                 
-                for morphi2 in iter_:
-                    if doEdgesMatch(morphi, morphi2):
+                for morphi2,properties2 in iter_:
+                    if self.doEdgesMatch(properties, properties2):
                         self.hom.edgeMap[morphi] = morphi2
                         for _ in self.matchNeighbourhood(edges, index+1, mode):
                             yield None
@@ -108,10 +112,21 @@ class HomomorphismIterator:
         if mode == "out":
             potential_images = self.G2.out_edges([node2],data = True)
         
-        for inneighbour2,neighbour2,morphi2 in potential_images:
-            morphi2 = morphi2["object"]
+        for inneighbour2,outneighbour2,morphidata2 in potential_images:
+            morphi2 = morphidata2["object"]
+            properties2 = morphidata2["propertyTags"]
+            
+            neighbour2 = (outneighbour2 if mode=="out" else inneighbour2)
+            
+            if not self.doNodesMatch(neighbour, neighbour2):
+                continue
+            if not self.doEdgesMatch(properties, properties2):
+                continue
+            
             self.hom.edgeMap[morphi] = morphi2
-            self.hom.nodeMap[neighbour] = (neighbour2 if mode=="out" else inneighbour2)
+            self.hom.nodeMap[neighbour] = neighbour2
+            
+            
             
             for _ in self.matchNeighbourhood(edges, index+1, mode):
                 yield None
@@ -119,101 +134,3 @@ class HomomorphismIterator:
             self.hom.edgeMap[morphi] = None
             self.hom.nodeMap[neighbour] = None
     
-
-if __name__ == "__main__":
-    def test1():
-        '''
-        D1
-        
-           f      g
-        A ---> B ---> C
-                
-                
-        D2        
-               X2 
-               |  F2
-               |  
-           F   V  G
-        X ---> Y ---> Z
-         <---  |    
-          G2   | id
-               Y
-           
-        '''
-        
-        D1 = Diagram()
-        D2 = Diagram()
-        
-        A = Object(D1,"A")
-        B = Object(D1,"B")
-        C = Object(D1,"C")
-        Morphism(A,B,"f")
-        Morphism(B,C,"g")
-        
-            
-        X = Object(D2,"X")
-        Y = Object(D2,"Y")
-        Z = Object(D2,"Z")
-        X2 = Object(D2,"X2")
-        
-        Morphism(X,Y,"F")
-        Morphism(Y,Z,"G")
-        Morphism(Y,Y,"id")
-        Morphism(X2,Y,"F2")
-        Morphism(Y,X,"G2")
-        
-        homiter = HomomorphismIterator(D1,D2)
-        for hom in homiter():
-            print hom
-            
-    def test2():
-        '''
-        D1
-        
-           f      
-        A ---> B
-         <\    / g
-       h  \   /     
-           C<-  
-             
-        D2        
-               
-           F      
-        X ---> Y
-         <\    / G
-       H  \   /     
-           Z<-
-           |
-           | id
-           Z
-             
-        '''
-        
-        D1 = Diagram()
-        D2 = Diagram()
-        
-        A = Object(D1,"A")
-        B = Object(D1,"B")
-        C = Object(D1,"C")
-        Morphism(A,B,"f")
-        Morphism(B,C,"g")
-        Morphism(C,A,"h")
-        
-            
-        X = Object(D2,"X")
-        Y = Object(D2,"Y")
-        Z = Object(D2,"Z")
-        
-        Morphism(X,Y,"F")
-        Morphism(Y,Z,"G")
-        Morphism(Z,X,"H")
-        Morphism(Z,Z,"idZ")
-        
-        homiter = HomomorphismIterator(D1,D2)
-        for hom in homiter():
-            print hom
-    
-    print "test1"
-    test1()
-    print "test2"
-    test2()

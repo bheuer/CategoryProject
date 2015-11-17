@@ -2,9 +2,8 @@ from collections import defaultdict
 from itertools import product
 from networkx import MultiDiGraph
 from networkx.algorithms.isomorphism  import DiGraphMatcher,generic_edge_match
-from networkx import isolates
 from networkx.algorithms.isolate import is_isolate
-from Morphisms import Morphism, AtomicMorphism
+from Morphisms import Morphism
 
 class Diagram(object):
     def __init__(self):
@@ -21,7 +20,7 @@ class Diagram(object):
         
     def addObject(self,obj):
         self.Objects.append(obj)
-        self.Graph.add_node(obj)
+        self.Graph.add_node(obj,propertyTags = set())
         
         self.addName(obj.name)
         self.Morphisms[obj]=defaultdict(list)
@@ -39,7 +38,7 @@ class Diagram(object):
         Morph = Morphism(morph)
         self.Morphisms[source][target].append(Morph)
         self.MorphismList.append(Morph)
-        self.Graph.add_edge(source,target,object = Morph)
+        self.Graph.add_edge(source,target,object = Morph,propertyTags = set())
         
         self.CommutingComponents[morph.id()]=morph.id()
     
@@ -90,7 +89,7 @@ class Diagram(object):
                         yield source,target,morphi
                         
             for morphis in product(*[morphi_iterator(s,t,m) for s,t,m in Subgraph.edges(data=True)]):
-                H = DiGraph()
+                H = MultiDiGraph()
                 H.add_nodes_from(imag for imag in Mapping.values())
             
                 for source,target,morphi in morphis:
