@@ -31,10 +31,11 @@ class Property:
 
     def registerPropertyTags(self):
         for node,image in self.homomorphism.iterNodes():
-            self.homomorphism.D2.node[image]["propertyTags"].add(PropertyTag(self.name,node.name,self.id))
+            self.homomorphism.D2.Graph.node[image]["propertyTags"].add(PropertyTag(self.name,node.name,self.id))
         #edgeTags not working because no edge objects   
-        #for edge,image in self.homomorphism.iterEdges():
-        #    self.homomorphism.D2.image["propertyTags"].add(PropertyTag(self.name,edge.name,self.id))
+        for morph,image in self.homomorphism.iterEdges():
+            morphiname = morph.Composition[0].name
+            self.homomorphism.D2.InverseLookUp[image]["propertyTags"].add(PropertyTag(self.name,morphiname,self.id))
             
     def processPropertyInput(self,args):
         if len(args)==1 and isinstance(args[0],Homomorphism):
@@ -83,3 +84,5 @@ class PropertyTag:
         #does not check whether they come from the same instance of a Property
         #used to check whether a topological homomorphism is also a functional homomorphism
         return (self.prop_name == ptag2.prop_name) and (self.function == ptag2.function)
+    def __hash__(self):#we want to consider sets of properties
+        return hash((self.prop_name,self.function))

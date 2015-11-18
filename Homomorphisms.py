@@ -12,6 +12,7 @@ class Homomorphism:
         self.D2 = D2
         self.nodeMap = nodeMap
         self.edgeMap = edgeMap
+        #do things on graph level, but def homomorphi on morphism (=data) level
     
     def __getitem__(self,ind):
         return self.nodeMap[ind]

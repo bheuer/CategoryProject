@@ -4,12 +4,6 @@ from networkx.algorithms.components.weakly_connected import weakly_connected_com
 from Diagram import Diagram,Morphism
 from Object import Object
 
-def iterateEdges(G,node1,node2):
-    dic = G[node1]
-    if dic.has_key(node2):
-        for K in dic[node2].values():
-            yield K["object"],K["propertyTags"]
-
 class HomomorphismIterator:
     def __init__(self,D1,D2):
         self.D1 = D1
@@ -35,7 +29,9 @@ class HomomorphismIterator:
         P2 = self.G2.node[node2]["propertyTags"]
         return P1.issubset(P2)
             
-    def doEdgesMatch(self,P1,P2):
+    def doEdgesMatch(self,edge1,edge2):
+        P1 = edge1["propertyTags"]
+        P2 = edge2["propertyTags"]
         return P1.issubset(P2)
     
     def matchComponents(self,index = 0):
@@ -56,8 +52,8 @@ class HomomorphismIterator:
     
     def matchNode(self,node):
         neighbourlist = [n for n in all_neighbors(self.G1,node) if self.hom.nodeMap.get(n) is None]
-        for _ in self.matchNeighbourhood(self.G1.out_edges([node],data = True),mode = "out"):
-            for _ in self.matchNeighbourhood(self.G1.in_edges([node],data = True),mode = "in"):
+        for _ in self.matchNeighbourhood(list(self.G1.out_edges(node)),mode = "out"):
+            for _ in self.matchNeighbourhood(list(self.G1.in_edges(node)),mode = "in"):
                 for _ in self.matchList(neighbourlist):
                     yield None
     
@@ -75,26 +71,28 @@ class HomomorphismIterator:
             yield None
             return
         
-        node,neighbour,morphidata = edges[index]
+        edge = edges[index]
+        node,neighbour = edge.source,edge.target
         if mode=="in":
             node,neighbour = neighbour,node
             
         node2 = self.hom.nodeMap[node]
-        morphi = morphidata["object"]
-        properties = morphidata["propertyTags"]
+        
+        morphi = edge["morphism"]
+        properties = edge["propertyTags"]
         
         
         neighbour2 = self.hom.nodeMap.get(neighbour)
         if neighbour2 is not None: #node assigned before
             if self.hom.edgeMap.get(morphi) is None: #but edge not: find morphism that works
                 if mode=="out":
-                    iter_ = iterateEdges(self.G2, node2,neighbour2)
-                    print self.hom.nodeMap
+                    iter_ = self.G2.iterate_edges(node2,neighbour2)
                 elif mode=="in":
-                    iter_ = iterateEdges(self.G2,neighbour2,node2)
+                    iter_ = self.G2.iterate_edges(neighbour2,node2)
                 
-                for morphi2,properties2 in iter_:
-                    if self.doEdgesMatch(properties, properties2):
+                for edge2 in iter_:
+                    if self.doEdgesMatch(edge, edge2):
+                        morphi2 = edge2["morphism"]
                         self.hom.edgeMap[morphi] = morphi2
                         for _ in self.matchNeighbourhood(edges, index+1, mode):
                             yield None
@@ -108,25 +106,24 @@ class HomomorphismIterator:
         #new edge
 
         if mode == "in":
-            potential_images = self.G2.in_edges([node2],data = True)
+            potential_images = self.G2.in_edges(node2)
         if mode == "out":
-            potential_images = self.G2.out_edges([node2],data = True)
+            potential_images = self.G2.out_edges(node2)
         
-        for inneighbour2,outneighbour2,morphidata2 in potential_images:
-            morphi2 = morphidata2["object"]
-            properties2 = morphidata2["propertyTags"]
+        for edge2 in potential_images:
+            
+            inneighbour2,outneighbour2 = edge2.source,edge2.target
+            morphi2 = edge2["morphism"]
             
             neighbour2 = (outneighbour2 if mode=="out" else inneighbour2)
             
             if not self.doNodesMatch(neighbour, neighbour2):
                 continue
-            if not self.doEdgesMatch(properties, properties2):
+            if not self.doEdgesMatch(edge, edge2):
                 continue
             
             self.hom.edgeMap[morphi] = morphi2
             self.hom.nodeMap[neighbour] = neighbour2
-            
-            
             
             for _ in self.matchNeighbourhood(edges, index+1, mode):
                 yield None
