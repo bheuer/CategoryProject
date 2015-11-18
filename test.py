@@ -2,6 +2,7 @@ from Diagram import *
 from Morphisms import *
 from HomomorphismIterator import *
 from Property import *
+from Property_base import *
 
 import unittest
 
@@ -373,11 +374,31 @@ if __name__ == "__main__":
             G = Morphism(X,Z,"G")
             
             homiter = HomomorphismIterator(D1,D2)
+            c = 0
             for hom in homiter():
                 print hom
+                c+=1
+            assert c==2
             
+            print "declare Epimorphisms"
             Epimorphism(f)
             Epimorphism(F)
+            print D1.InverseLookUp[f]
+            print D2.InverseLookUp[F]
+            
+            homiter = HomomorphismIterator(D1,D2)
+            c=0
+            for hom in homiter():
+                print hom
+                c+=1
+            assert c==1
+            
+            #test Properties hashable and hash only checks function, not id
+            p = PropertyTag(1,2,3)
+            q = PropertyTag(1,2,4)
+            P = set([p])
+            Q = set([q])
+            assert P.issubset(Q)
             
             
     
@@ -387,4 +408,3 @@ if __name__ == "__main__":
     test2()
     print "test3"
     test3()
-        
