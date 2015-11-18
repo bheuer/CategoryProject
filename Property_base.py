@@ -3,6 +3,48 @@ from Homomorphisms import Homomorphism
 from Morphisms import Morphism
 from Object import Object
 
+''' 
+A Property is a purely syntactic object that assigns a certain FUNCTIONAL PROPERTIES
+(not "functioral" to a subdiagram. 
+
+As an example consider the Diagram
+    
+    C
+    |
+   AxB            D
+f /  \ g
+ A    B
+
+where AxB denotes the product of A and B, f and g are the projection maps,
+and where C is some arbitrary object . The Graph member of the Diagram class
+can be used to represent the structure of this Diagram topologically.#
+In order to make a statement about that AxB is the product, of A and B,
+ie that AxB has the "functional meaning" to be a product, we can take a 
+CHARACTERISTIC DIAGRAM wish defines how a product looks like in general
+
+    product
+ pi1 /   \ pi2       CharD
+factor1  factor2
+
+we then consider the Homomorphism of Diagrams
+
+
+CharD -> D:
+    product -> AxB
+    factor1 -> A
+    factor2 -> B
+    
+    pi1 -> f
+    pi2 ->g
+
+This homomorphism assigns to the subdiagram induced by A,B,AxB the 
+functional meanings representing the categorial structure of the product.
+
+We can therefore represent the statement "AxB is the product of A and B"
+by the homomorphism from the characteristic diagram into D. This is 
+exactly what the Property class does.
+'''
+
 #abstractBaseClass
 class Property:
     homomorphism = None
