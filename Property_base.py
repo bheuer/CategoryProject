@@ -43,6 +43,9 @@ functional meanings representing the categorial structure of the product.
 We can therefore represent the statement "AxB is the product of A and B"
 by the homomorphism from the characteristic diagram into D. This is 
 exactly what the Property class does.
+
+Note that this does not incorporate any MEANING of the product, ie its 
+universal property. This is dealt with by the Rules class.
 '''
 
 #abstractBaseClass
@@ -114,7 +117,6 @@ class Property:
         return hom
 
 #~end of definition of class Property
-
 
 class PropertyTag:
     def __init__(self,prop_name,function,property_id):

@@ -76,7 +76,7 @@ class Morphism(AbstractMorphism):
         source = morphilist[-1].source
         target = morphilist[0].target
         
-        super(Morphism,self).__init__(source,target)
+        AbstractMorphism.__init__(source,target)
         
         #create list of constituting user-defined Morphisms
         self.Composition = []
@@ -91,8 +91,7 @@ class Morphism(AbstractMorphism):
                 raise ValueError
                 
         if self.Composition==[] and source==target:
-            self.Composition=Identity(target)
-        
+            self.Composition=Identity(target) 
         
     def length(self):
         return len(self.Composition)
@@ -129,18 +128,14 @@ class Morphism(AbstractMorphism):
 
 class AtomicMorphism(Morphism):
     def __init__(self,source,target,name):
-        super(Morphism,self).__init__(source,target)
+        
+        AbstractMorphism.__init__(source,target)
         self.name = name
         self.Composition = [self]
-        
         self.diagram.addMorphi(self)
-        
     
     def __repr__(self):
         return self.name
-    
-    #def id(self):
-    #    return self.name
     
     def __eq__(self,morphi):
         if not isinstance(morphi,AtomicMorphism):
