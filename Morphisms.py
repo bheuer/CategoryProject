@@ -127,7 +127,7 @@ class Morphism(AbstractMorphism):
 class AtomicMorphism(Morphism):
     def __init__(self,source,target,name):
         
-        AbstractMorphism.__init__(source,target)
+        super(Morphism,self).__init__(source,target)
         self.name = name
         self.Composition = [self]
         self.diagram.addMorphi(self)

@@ -16,6 +16,7 @@ class Diagram(object):
         self.CommutingComponents = {}
         
         self.MorphismList = []
+        self.Properties = []
         
     def addObject(self,obj):
         self.Objects.append(obj)
@@ -42,6 +43,18 @@ class Diagram(object):
         self.InverseLookUp[Morph] = edge
         
         self.CommutingComponents[morph.id()]=morph.id()
+    
+    def __get__(self,item):
+        for i in self.Objects:
+            if i.name == item:
+                return i
+        for i in self.Morphisms:
+            if i.name == item:
+                return i
+        
+            
+    def addProperty(self,prop):
+        self.Properties.append(prop)
     
     def addName(self,name):
         
