@@ -104,6 +104,20 @@ class Homomorphism:
             if not self.edgeMap[edge]==image:
                 raise ValueError,"incoherent init edge: edge image has been assigned two different values"
     
+    def __mul__(self,hom2):
+        assert isinstance(hom2,Homomorphism)
+        newEdgeMap = {}
+        newNodeMap = {}
+        
+        for node,image in hom2.iterNodes():
+            newNodeMap[node] = self[image]
+        
+        for edge,image in hom2.iterEdges():
+            newEdgeMap[edge] = self.get_edge_image(image)
+        
+        return Homomorphism(hom2.D1,self.D2,nodeMap = newNodeMap, edgeMap = newEdgeMap)
+        
+    
     def __repr__(self):
         str_ = ""
         str_+= "Nodes:\n"

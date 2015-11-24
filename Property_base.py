@@ -3,53 +3,54 @@ from Homomorphisms import Homomorphism
 from Morphisms import Morphism
 from Object import Object
 
-''' 
-A Property is a purely syntactic object that assigns a certain FUNCTIONAL PROPERTIES
-(not "functioral" to a subdiagram. 
-
-As an example consider the Diagram
-    
-    C
-    |
-   AxB            D
-f /  \ g
- A    B
-
-where AxB denotes the product of A and B, f and g are the projection maps,
-and where C is some arbitrary object . The Graph member of the Diagram class
-can be used to represent the structure of this Diagram topologically.#
-In order to make a statement about that AxB is the product, of A and B,
-ie that AxB has the "functional meaning" to be a product, we can take a 
-CHARACTERISTIC DIAGRAM wish defines how a product looks like in general
-
-    product
- pi1 /   \ pi2       CharD
-factor1  factor2
-
-we then consider the Homomorphism of Diagrams
-
-
-CharD -> D:
-    product -> AxB
-    factor1 -> A
-    factor2 -> B
-    
-    pi1 -> f
-    pi2 ->g
-
-This homomorphism assigns to the subdiagram induced by A,B,AxB the 
-functional meanings representing the categorial structure of the product.
-
-We can therefore represent the statement "AxB is the product of A and B"
-by the homomorphism from the characteristic diagram into D. This is 
-exactly what the Property class does.
-
-Note that this does not incorporate any MEANING of the product, ie its 
-universal property. This is dealt with by the Rules class.
-'''
-
 #abstractBaseClass
 class Property:
+    '''Abstract base class for implementations of Subdiagram Properties
+    
+    A Property is a purely syntactic object that assigns a certain FUNCTIONAL PROPERTIES
+    (not "functioral" to a subdiagram. 
+    
+    As an example consider the below Diagram for the univseral property of product
+        
+        C
+        |
+       AxB            
+    f /  \ g
+     A    B
+    
+    where AxB denotes the product of A and B, f and g are the projection maps,
+    and where C is some arbitrary object . The Graph member of the Diagram class
+    can be used to represent the structure of this Diagram topologically.#
+    In order to make a statement about that AxB is the product, of A and B,
+    ie that AxB has the "functional meaning" to be a product, we can take a 
+    CHARACTERISTIC DIAGRAM wish defines how a product looks like in general
+    
+        product
+     pi1 /   \ pi2       CharD
+    factor1  factor2
+    
+    we then consider the Homomorphism of Diagrams
+    
+    
+    CharD -> D:
+        product -> AxB
+        factor1 -> A
+        factor2 -> B
+        
+        pi1 -> f
+        pi2 ->g
+    
+    This homomorphism assigns to the subdiagram induced by A,B,AxB the 
+    functional meanings representing the categorial structure of the product.
+    
+    We can therefore represent the statement "AxB is the product of A and B"
+    by the homomorphism from the characteristic diagram into D. This is 
+    exactly what the Property class does.
+    
+    Note that this does not incorporate any MEANING of the product, ie its 
+    universal property. This is dealt with by the Rules class.
+    ''' 
+    
     homomorphism = None
     name = None
     def __init__(self,*args):    
@@ -57,6 +58,8 @@ class Property:
         self.homomorphism = self.processPropertyInput(args)
         self.id = id(self)
         self.registerPropertyTags()
+        
+        self.homomorphism.D2.addProperty(self)
         
     def buildCharDiagram(self):
         raise NotImplementedError
@@ -68,7 +71,7 @@ class Property:
         
     def definingData(self):
         return (self.name,self.homomorphism.definingData())
-    
+        
     def __repr__(self):
         str_ = "Property '{}' with homomorphism:\n".format(self.name)
         str_+=str(self.homomorphism)
@@ -115,7 +118,11 @@ class Property:
         else:
             raise ValueError,"keine Ahnung was das sein soll"
         return hom
-
+    def push_forward(self,hom):
+        assert isinstance(hom, Homomorphism)
+        assert hom.D1==self.homomorphism.D2
+        return self.__class__(hom*self.homomorphism)  
+    
 #~end of definition of class Property
 
 class PropertyTag:
@@ -130,3 +137,5 @@ class PropertyTag:
         return (self.prop_name == ptag2.prop_name) and (self.function == ptag2.function)
     def __hash__(self):#we want to consider sets of properties
         return hash((self.prop_name,self.function))
+    
+print help(Property)
