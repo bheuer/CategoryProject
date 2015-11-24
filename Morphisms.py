@@ -1,6 +1,3 @@
-from collections import defaultdict 
-from itertools import product
-from copy import deepcopy
 from Object import Object
 
 class AbstractMorphism(object):
@@ -43,6 +40,7 @@ def isWellDefined(ListOfMorphisms):
 def processInputMorphisms(args):
     #takes different sorts of user input and makes it into 
     #a list of morphisms that represent a (possibly composed) morphism
+    
     if len(args)==3 and isinstance(args[0],Object) and isinstance(args[1],Object) and isinstance(args[2],str):
         args=[AtomicMorphism(*args)]
         

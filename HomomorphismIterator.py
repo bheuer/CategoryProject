@@ -1,8 +1,6 @@
 from Homomorphisms import Homomorphism
 from networkx.classes.function import all_neighbors
 from networkx.algorithms.components.weakly_connected import weakly_connected_components
-from Diagram import Diagram,Morphism
-from Object import Object
 
 class HomomorphismIterator:
     def __init__(self,D1,D2):

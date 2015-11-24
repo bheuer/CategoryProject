@@ -51,12 +51,19 @@ class Homomorphism:
         #do things on graph level, but def homomorphi on morphism (=data) level
     
     def __getitem__(self,ind):
-        if isinstance(ind,Edge):
-            return self.edgeMap[ind]
         return self.nodeMap[ind]
     
     def __setitem__(self,ind,val):
         self.nodeMap[ind] = val
+    
+    def get_edge_image(self,item):
+        return self.edgeMap[item]
+    
+    def is_defined_on_edge(self,edge):
+        return self.edgeMap.has_key(edge)
+    
+    def is_defined_on_node(self,node):
+        return self.nodeMap.has_key(node)
     
     def iterNodes(self):
         for node in self.nodeMap:
@@ -96,6 +103,7 @@ class Homomorphism:
         else: 
             if not self.edgeMap[edge]==image:
                 raise ValueError,"incoherent init edge: edge image has been assigned two different values"
+    
     def __repr__(self):
         str_ = ""
         str_+= "Nodes:\n"
@@ -105,7 +113,7 @@ class Homomorphism:
         for edge in self.D1.MorphismList:
             str_+= "  ({}) -> ({})\n".format(edge,self.edgeMap.get(edge))
         return str_
-
+    
 def copyDictWithoutCopyingEntries(dic):
     return dict((key,value) for key,value in dic.items())
             

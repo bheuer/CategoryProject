@@ -18,7 +18,7 @@ class MorphismsProperty(Property):
 class Epimorphism(MorphismsProperty):
     name = "epimorphism"
 
-class Product(Property):
+class ProductProperty(Property):
     name = "product"
     def buildCharDiagram(self):
         D = Diagram()
@@ -44,7 +44,7 @@ if __name__ == "__main__":
     f = Morphism(AxB,A,"f")
     g = Morphism(AxB,B,"g") 
     
-    p = Product(f,g)
+    p = ProductProperty(f,g)
     zero = ZeroObject(A)
     epi = Epimorphism(f)
     
