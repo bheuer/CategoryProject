@@ -1,7 +1,5 @@
-from Morphisms import Morphism
-from Object import Object
-from Property_base import Property
-from Diagram import Diagram
+from base import Property
+from Diagram import Diagram,Object,Morphism
 
 class MorphismsProperty(Property):
     def buildCharDiagram(self,D):
@@ -13,6 +11,9 @@ class MorphismsProperty(Property):
         return str_
         
 class Epimorphism(MorphismsProperty):
+    name = "epimorphism"
+    
+class Monomorphism(MorphismsProperty):
     name = "epimorphism"
 
 class ProductProperty(Property):

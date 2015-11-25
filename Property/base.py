@@ -1,7 +1,6 @@
-from Diagram import Diagram, isolatedNodes
-from Homomorphisms import Homomorphism
-from Morphisms import Morphism
-from Object import Object
+from Diagram import Diagram, Object, Morphism
+from Diagram.Diagram import isolatedNodes
+from Homomorphism import Homomorphism
 
 #abstractBaseClass
 class Property:

@@ -1,4 +1,4 @@
-from Homomorphisms import Homomorphism
+from Homomorphism import Homomorphism
 from Diagram import Diagram
 
 #abstract base class

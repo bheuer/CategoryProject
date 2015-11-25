@@ -1,7 +1,8 @@
 from collections import defaultdict 
 from networkx.algorithms.isolate import is_isolate
-from Morphisms import Morphism, AbstractMorphism, AtomicMorphism
-from Homomorphisms import IamTiredOfNetworkxNotHavingAnEdgeObjectGraph,Homomorphism
+from Morphisms import Morphism
+from Graph import IamTiredOfNetworkxNotHavingAnEdgeObjectGraph
+from Homomorphism import Homomorphism
 
 class Diagram(object):
     def __init__(self):

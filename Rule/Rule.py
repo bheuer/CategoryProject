@@ -1,10 +1,6 @@
 from Property import ProductProperty
-from Morphisms import Morphism
-from Diagram import Diagram,Commute
-from Object import Object
-from __builtin__ import NotImplementedError
-from Homomorphisms import Homomorphism
-from Rule_base import RuleGenerator
+from Diagram import Commute,Morphism,Object
+from base import RuleGenerator
 
 class ExistProduct(RuleGenerator):
     def CharacteristicDiagram(self,CD):

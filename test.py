@@ -1,9 +1,9 @@
-from Diagram import Diagram,Commute
-from Morphisms import *
-from HomomorphismIterator import HomomorphismIterator
-from Property import ProductProperty,Epimorphism,Monomorphism
-from Object import Object
-from Property_base import PropertyTag
+from Diagram import *
+from Diagram.Morphisms import AbstractMorphism,Identity
+from Homomorphism import HomomorphismIterator
+from Property import *
+from Property.base import PropertyTag
+from Rule import RuleMaster
 
 
 
@@ -393,7 +393,6 @@ if __name__ == "__main__":
         Object(D,"B")
         B = D["B"]
         
-        from RuleMaster import RuleMaster
         RM = RuleMaster(D)
         for i in xrange(5):
             print "next implementation of a rule"

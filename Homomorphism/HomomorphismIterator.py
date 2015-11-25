@@ -1,4 +1,4 @@
-from Homomorphisms import Homomorphism
+from Homomorphism.base import Homomorphism
 from networkx.classes.function import all_neighbors
 from networkx.algorithms.components.weakly_connected import weakly_connected_components
 

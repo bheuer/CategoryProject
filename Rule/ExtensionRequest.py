@@ -1,5 +1,4 @@
-from Morphisms import Morphism
-from Object import Object
+from Diagram import Morphism,Object
 
 
 class ExtensionRequest:

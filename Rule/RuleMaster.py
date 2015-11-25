@@ -1,7 +1,5 @@
-from Diagram import Diagram
-from HomomorphismIterator import HomomorphismIterator
+from Homomorphism import HomomorphismIterator
 from ExtensionRequest import ExtensionRequest
-from Property import *
 from Rule import ProductRule,ExistProduct
 
 class RuleMaster:
