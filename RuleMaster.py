@@ -2,7 +2,7 @@ from Diagram import Diagram
 from HomomorphismIterator import HomomorphismIterator
 from ExtensionRequest import ExtensionRequest
 from Property import *
-from Rule import *
+from Rule import ProductRule,ExistProduct
 
 class RuleMaster:
     
@@ -27,13 +27,20 @@ class RuleMaster:
                     continue
                 self.ExtensionRequests.add(ER)
         
-        er = sorted(self.ExtensionRequests,key = MaxObjectPriority)[0]
+        er = sorted(self.ExtensionRequests,key = CustomRuleWeight_MaxObjectPrioritiser)[0]
+        print er.rule.name
+        print er.hom
         er.implement()
         self.ExtensionRequests.remove(er)
         self.implemented.add(er)
-        
+
+
 NoPriority = lambda ER:0
+
 def MaxObjectPriority(ER):
     return max(ER.hom.D2.Objects.index(image) for _,image in ER.hom.iterNodes() if image is not None)
     
+Weights = {"ProductRule":0,"ExistProduct":1}
+def CustomRuleWeight_MaxObjectPrioritiser(ER,weights = Weights): #careful with default value, I know, but this should work
+    return (Weights[ER.rule.name],MaxObjectPriority(ER))
     

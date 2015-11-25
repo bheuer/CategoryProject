@@ -1,8 +1,9 @@
-from Diagram import *
+from Diagram import Diagram,Commute
 from Morphisms import *
-from HomomorphismIterator import *
-from Property import *
-from Property_base import *
+from HomomorphismIterator import HomomorphismIterator
+from Property import ProductProperty,Epimorphism,Monomorphism
+from Object import Object
+from Property_base import PropertyTag
 
 
 
@@ -66,7 +67,7 @@ class SimpleCommutativityTestCase(unittest.TestCase):
     
     
         assert g2*f1!=h1*g1
-        D.addRule(Commute(g2*f1, h1*g1))
+        Commute(g2*f1, h1*g1)
         assert g2*f1==h1*g1
         assert D.commutes(g2*f1, g2*f1)
         assert D.commutes(g2*f1, h1*g1)
@@ -108,13 +109,13 @@ class SecondCommutativityTestCase(unittest.TestCase):
         assert f2*f1==f2*f1
         assert not f2*f1==g2*f1
     
-        D.addRule(Commute(g2*f1,h1*g1))
+        Commute(g2*f1,h1*g1)
         assert g2*f1==h1*g1
         
         assert g3*f2!=h2*g2
         assert g3*f2*f1!=h2*g2*f1
         
-        D.addRule(Commute(g3*f2,h2*g2))
+        Commute(g3*f2,h2*g2)
         assert g3*f2==h2*g2
         assert D.commutes(g3*f2,h2*g2)
 
@@ -160,10 +161,10 @@ class MonomEpiTestCase(unittest.TestCase):
         
         assert g2*f1*f0==h1*g1*f0
         assert g2*f1!=h1*g1
-        D.addRule(Epim(f0))
+        Epimorphism(f0)
         assert g2*f1==h1*g1
         
-        D.addRule(Mono(h3))
+        Monomorphism(h3)
         assert g3*f2!=h2*g2
         D.addRule(Commute(h3*g3*f2,h3*h2*g2))
         assert g3*f2==h2*g2
@@ -197,7 +198,7 @@ class CyclesTestCase(unittest.TestCase):
         
         loop =  f1*g2*h1*g1
         assert loop!=A1.Identity
-        D.addRule(Commute(loop,A1.Identity))
+        Commute(loop,A1.Identity)
         assert loop==A1.Identity
 
 class ProductTestCase(unittest.TestCase):
@@ -225,29 +226,12 @@ class ProductTestCase(unittest.TestCase):
         f = Morphism(V,P,"f")
         g = Morphism(V,P,"g")
     
-        D.addRule(IntoProduct(f,pi1,pi2))
-        D.addRule(Commute(pi2*f,pi2*g))
+        ProductProperty(pi1,pi2)
+        Commute(pi2*f,pi2*g)
         
         assert f!=g
-        D.addRule(Commute(pi1*f,pi1*g))
+        Commute(pi1*f,pi1*g)
         assert f==g
-
-class RuleTestCase(unittest.TestCase):
-    def runTest(self):
-        D = Diagram()
-        
-        A = Object(D,"A")
-        B = Object(D,"B")
-        P = Object(D,"P")
-        V = Object(D,"V")
-        
-        pi1 = Morphism(P,A,"pi1")
-        pi2 = Morphism(P,B,"pi2")
-        f = Morphism(V,P,"f")
-        
-        rule = IntoProduct(f,pi1,pi2)
-        D.addRule(rule)
-        assert rule.definingData()==[(pi1,pi2),f], rule.definingData()
         
 if __name__ == "__main__":
     def test1():
@@ -411,8 +395,8 @@ if __name__ == "__main__":
         
         from RuleMaster import RuleMaster
         RM = RuleMaster(D)
-        for i in xrange(6):
+        for i in xrange(5):
+            print "next implementation of a rule"
             RM()
             print D.Properties
-            
     print test4()
