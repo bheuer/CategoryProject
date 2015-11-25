@@ -5,6 +5,8 @@ from networkx import *
 from networkx.algorithms.isomorphism.isomorph import is_isomorphic
 from Morphisms import AbstractMorphism
 
+raise ImportError
+
 class Rule(object):
     dynamic = False
     def __init__(self):

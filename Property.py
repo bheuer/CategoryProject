@@ -3,14 +3,11 @@ from Object import Object
 from Property_base import Property
 from Diagram import Diagram
 
-
 class MorphismsProperty(Property):
-    def buildCharDiagram(self):
-        D = Diagram()
+    def buildCharDiagram(self,D):
         A = Object(D,"O1")
         B = Object(D,"O2")
         self.morph = Morphism(A,B,"f")
-        return D
     def __repr__(self):
         str_ = "Morphism Property '{}' for morphism {}".format(self.name,self.homomorphism.edgeMap[self.morph])
         return str_
@@ -20,21 +17,17 @@ class Epimorphism(MorphismsProperty):
 
 class ProductProperty(Property):
     name = "product"
-    def buildCharDiagram(self):
-        D = Diagram()
+    def buildCharDiagram(self,D):
         A = Object(D,"factor1",)
         B = Object(D,"factor2")
         AxB = Object(D,"product")
         Morphism(AxB,A,"pi1")
         Morphism(AxB,B,"pi2")
-        return D
 
 class ZeroObject(Property):
     name = "zero"
-    def buildCharDiagram(self):
-        D = Diagram()
+    def buildCharDiagram(self,D):
         Object(D,"0",)
-        return D
 
 if __name__ == "__main__":
     D = Diagram()

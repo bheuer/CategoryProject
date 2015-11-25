@@ -41,6 +41,9 @@ def processInputMorphisms(args):
     #takes different sorts of user input and makes it into 
     #a list of morphisms that represent a (possibly composed) morphism
     
+    if len(args)==2 and isinstance(args[0],Object) and isinstance(args[1],Object):
+        args=[AtomicMorphism(*args)]
+    
     if len(args)==3 and isinstance(args[0],Object) and isinstance(args[1],Object) and isinstance(args[2],str):
         args=[AtomicMorphism(*args)]
         
@@ -74,7 +77,7 @@ class Morphism(AbstractMorphism):
         source = morphilist[-1].source
         target = morphilist[0].target
         
-        AbstractMorphism.__init__(source,target)
+        AbstractMorphism.__init__(self,source,target)
         
         #create list of constituting user-defined Morphisms
         self.Composition = []
@@ -94,6 +97,11 @@ class Morphism(AbstractMorphism):
     def length(self):
         return len(self.Composition)
     
+    def name(self):
+        l = self.id()
+        assert len(l)==1 #everybody close your eyes
+        return l[0]
+    
     def id(self):
         return tuple([m.name for m in self.Composition])
     
@@ -101,7 +109,6 @@ class Morphism(AbstractMorphism):
         return hash(self.id())
     
     def __eq__(self,morphi):
-        
         if not isinstance(morphi,Morphism):
             raise ValueError
         
@@ -125,9 +132,11 @@ class Morphism(AbstractMorphism):
         return s
 
 class AtomicMorphism(Morphism):
-    def __init__(self,source,target,name):
+    def __init__(self,source,target,name=None):
         
         super(Morphism,self).__init__(source,target)
+        if name is None:
+            name = self.diagram.giveName(mode="m")
         self.name = name
         self.Composition = [self]
         self.diagram.addMorphi(self)
@@ -137,7 +146,7 @@ class AtomicMorphism(Morphism):
     
     def __eq__(self,morphi):
         if not isinstance(morphi,AtomicMorphism):
-            return morphi==self
+            return morphi.__eq__(self)
         if morphi.name==self.name and morphi.target == self.target and morphi.source == self.source:
             return True
         return False

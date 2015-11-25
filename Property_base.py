@@ -53,8 +53,9 @@ class Property:
     
     homomorphism = None
     name = None
-    def __init__(self,*args):    
-        self.charDiagram = self.buildCharDiagram()
+    def __init__(self,*args):
+        self.charDiagram = Diagram()
+        self.buildCharDiagram(self.charDiagram)
         self.homomorphism = self.processPropertyInput(args)
         self.id = id(self)
         self.registerPropertyTags()
@@ -88,7 +89,7 @@ class Property:
     def processPropertyInput(self,args):
         if len(args)==1 and isinstance(args[0],Homomorphism):
             hom = args[0]
-            assert hom.source.is_isomorphic(self.charDiagram)
+            #assert hom.D1.is_isomorphic(self.charDiagram)
         elif len(args)==1 and isinstance(args[0],Diagram):
             raise NotImplementedError
         elif len(args)>0:
@@ -97,7 +98,6 @@ class Property:
             args = list(args) # make manipulatable and removable and poppable and stuff
             diagram = args[0].diagram
             signature_edges,signature_nodes = self.initSignature()
-            
             hom = Homomorphism(self.charDiagram,diagram)
             try:
                 for edge in signature_edges:
@@ -118,10 +118,11 @@ class Property:
         else:
             raise ValueError,"keine Ahnung was das sein soll"
         return hom
+
     def push_forward(self,hom):
         assert isinstance(hom, Homomorphism)
         assert hom.D1==self.homomorphism.D2
-        return self.__class__(hom*self.homomorphism)  
+        return self.__class__(hom*self.homomorphism)
     
 #~end of definition of class Property
 
@@ -137,5 +138,3 @@ class PropertyTag:
         return (self.prop_name == ptag2.prop_name) and (self.function == ptag2.function)
     def __hash__(self):#we want to consider sets of properties
         return hash((self.prop_name,self.function))
-    
-print help(Property)

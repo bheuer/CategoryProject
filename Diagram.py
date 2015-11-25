@@ -1,8 +1,8 @@
 from collections import defaultdict 
 from networkx.algorithms.isolate import is_isolate
-from Morphisms import Morphism
-from Homomorphisms import IamTiredOfNetworkxNotHavingAnEdgeObjectGraph
-        
+from Morphisms import Morphism, AbstractMorphism, AtomicMorphism
+from Homomorphisms import IamTiredOfNetworkxNotHavingAnEdgeObjectGraph,Homomorphism
+
 class Diagram(object):
     def __init__(self):
         self.Objects = []
@@ -44,12 +44,12 @@ class Diagram(object):
         
         self.CommutingComponents[morph.id()]=morph.id()
     
-    def __get__(self,item):
+    def __getitem__(self,item):
         for i in self.Objects:
             if i.name == item:
                 return i
-        for i in self.Morphisms:
-            if i.name == item:
+        for i in self.MorphismList:
+            if len(i.id())==1 and i.id()[0]==item:
                 return i
         
             
@@ -62,11 +62,11 @@ class Diagram(object):
             raise ValueError,"name {} already given".format(name)
         self.UNIVERSE.add(name)
     
-    def giveName(self):
+    def giveName(self,mode="o"):
         i=0
-        while "o"+str(i) in self.UNIVERSE:
+        while mode+str(i) in self.UNIVERSE:
             i+=1
-        return "o"+str(i)
+        return mode+str(i)
     
     def unify(self,morph1,morph2):
         '''take two Morphisms and register that they should be considered equal'''
@@ -95,3 +95,20 @@ def isolatedNodes(diagram):
     for o in diagram.Objects:
         if is_isolate(diagram.Graph,o):
             yield o
+
+class Commute:
+    def __init__(self,*args):
+        assert len(args)>0 and all(isinstance(i,Morphism) for i in args)
+        self.MorphiList = args
+        diagram = args[0].diagram
+        diagram.addProperty(self)
+        morph0 = self.MorphiList[0]
+        for i in xrange(1,len(self.MorphiList)):
+            morph = self.MorphiList[i]
+            assert morph // morph0
+            diagram.unify(morph0,morph)
+    
+    def push_forward(self,hom):
+        assert isinstance(hom, Homomorphism)
+        return Commute(*(hom.get_edge_image(morph) for morph in self.MorphiList))
+    

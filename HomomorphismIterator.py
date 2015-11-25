@@ -17,7 +17,7 @@ class HomomorphismIterator:
         for G in weakly_connected_components(self.G1):
             self.componentRepresentatives.append(G.pop())
         
-    def __call__(self):
+    def __iter__(self):
         self.initialize()
         for _ in self.matchComponents():
             yield self.hom.copy()

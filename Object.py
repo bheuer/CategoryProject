@@ -4,7 +4,7 @@ class Object(object):
         self.diagram = diagram
         self.name = name
         
-        self.name not in self.diagram.UNIVERSE
+        assert self.name not in self.diagram.UNIVERSE
         
         if name is None:
             self.name = diagram.giveName()

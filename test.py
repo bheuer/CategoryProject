@@ -4,6 +4,8 @@ from HomomorphismIterator import *
 from Property import *
 from Property_base import *
 
+
+
 import unittest
 
 class CompositionTestCase(unittest.TestCase):
@@ -290,7 +292,7 @@ if __name__ == "__main__":
         Morphism(Y,X,"G2")
         
         homiter = HomomorphismIterator(D1,D2)
-        for hom in homiter():
+        for hom in homiter:
             print hom
             
     def test2():
@@ -337,7 +339,7 @@ if __name__ == "__main__":
             Morphism(Z,Z,"idZ")
             
             homiter = HomomorphismIterator(D1,D2)
-            for hom in homiter():
+            for hom in homiter:
                 print hom
         
     def test3():
@@ -375,7 +377,7 @@ if __name__ == "__main__":
             
             homiter = HomomorphismIterator(D1,D2)
             c = 0
-            for hom in homiter():
+            for hom in homiter:
                 print hom
                 c+=1
             assert c==2
@@ -388,7 +390,7 @@ if __name__ == "__main__":
             
             homiter = HomomorphismIterator(D1,D2)
             c=0
-            for hom in homiter():
+            for hom in homiter:
                 print hom
                 c+=1
             assert c==1
@@ -400,11 +402,17 @@ if __name__ == "__main__":
             Q = set([q])
             assert P.issubset(Q)
             
+    def test4():
+        
+        D = Diagram()
+        A = Object(D,"A")
+        Object(D,"B")
+        B = D["B"]
+        
+        from RuleMaster import RuleMaster
+        RM = RuleMaster(D)
+        for i in xrange(6):
+            RM()
+            print D.Properties
             
-    
-    print "test1"
-    test1()
-    print "test2"
-    test2()
-    print "test3"
-    test3()
+    print test4()

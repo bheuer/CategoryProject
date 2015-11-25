@@ -72,21 +72,27 @@ class ExtensionRequest:
     def __hash__(self):
         return self.hashvalue
     
-    def __call__(self):
+    def __eq__(self,ER):
+        return hash(self)==hash(ER)
+    
+    def implement(self):
         '''carry out the pushout of the Extension Meta-Diagram'''
         #Extend hom to a lift of the extension to the main Diagram
+        lift = self.hom*self.rule.partialInverse #inefficient
         for obj in self.rule.newObjects:
-            self.hom[obj] = Object(self.mainDiag)
+            newobj = Object(self.mainDiag)
+            lift.set_node_image(obj,newobj)
         
         for morphi in self.rule.newMorphisms:
-            source = self.hom[morphi.source]
-            target = self.hom[morphi.target]
-            self.hom[morphi] = Morphism(source,target)
+            source = lift[morphi.source]
+            target = lift[morphi.target]
+            newmorphi = Morphism(source,target)
+            lift.set_edge_image(morphi,newmorphi)
        
         #compose characteristic homomorphism of property with lift to get
         #characteristic homomorphism in the extended main Diagram
         for prop in self.rule.newProperties:
-            self.mainDiag.addProperty(prop.push_forward(self.hom)) 
+            prop.push_forward(lift)
                 
                 
                 

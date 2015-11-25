@@ -56,8 +56,21 @@ class Homomorphism:
     def __setitem__(self,ind,val):
         self.nodeMap[ind] = val
     
-    def __hash__(self,ind,val):
-        return hash((tuple(self.nodeMap.items()),tuple(self.edgeMap.items())))
+    def __hash__(self):
+        #So Dictionaries aren't hashable. We need to tuplelize them first,
+        #that is, transform them in a tuple (key,value)
+        #Moreover, dictionaries aren't order-safe. So we can't just iterate
+        #and tuplelize whatever we find.
+        #Instead, we sort the keys alphanumerically by their names
+        #(that is, Object with name "A" < Object with name "B")
+        #then, we can hash (ordered entries of node map, ordered entries of edge map)
+        #I know this doesn't work for more general Graph Homomorphisms but I'm tired and also
+        #WE ARE WRITING THIS ONLY FOR CATEGORIES, OK!?
+        
+        alphanumericSortingKey = lambda (a,b):a.name
+        nodes = tuple(sorted(self.nodeMap.items(),key = alphanumericSortingKey))
+        edges = tuple(sorted(self.edgeMap.items(),key = alphanumericSortingKey))
+        return hash((nodes,edges))
     
     def get_edge_image(self,item):
         return self.edgeMap[item]
