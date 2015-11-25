@@ -1,4 +1,5 @@
 from networkx import MultiDiGraph
+from Morphisms import Morphism
 
 class Edge:
     def __init__(self,node1,node2,key,data):
@@ -73,7 +74,11 @@ class Homomorphism:
         return hash((nodes,edges))
     
     def get_edge_image(self,item):
-        return self.edgeMap[item]
+        if self.edgeMap.has_key(item):
+            return self.edgeMap[item]
+        elif len(item.Composition)>1:
+            return Morphism([self.edgeMap[atomic] for atomic in item.Composition])
+            
     
     def is_defined_on_edge(self,edge):
         return self.edgeMap.has_key(edge)

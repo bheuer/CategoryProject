@@ -112,3 +112,11 @@ class Commute:
         assert isinstance(hom, Homomorphism)
         return Commute(*(hom.get_edge_image(morph) for morph in self.MorphiList))
     
+    def __repr__(self):
+        str_ = "Property 'commute' for the following morphisms:\n"
+        for morph in self.MorphiList:
+            str_+="{}\n".format(morph)
+        return str_
+            
+        
+        
