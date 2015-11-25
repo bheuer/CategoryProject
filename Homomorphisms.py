@@ -49,12 +49,15 @@ class Homomorphism:
         self.nodeMap = nodeMap
         self.edgeMap = edgeMap
         #do things on graph level, but def homomorphi on morphism (=data) level
-    
+        
     def __getitem__(self,ind):
         return self.nodeMap[ind]
     
     def __setitem__(self,ind,val):
         self.nodeMap[ind] = val
+    
+    def __hash__(self,ind,val):
+        return hash((tuple(self.nodeMap.items()),tuple(self.edgeMap.items())))
     
     def get_edge_image(self,item):
         return self.edgeMap[item]

@@ -1,6 +1,5 @@
 from Morphisms import Morphism
 from Object import Object
-from Diagram import Diagram
 
 
 class ExtensionRequest:
@@ -47,13 +46,32 @@ class ExtensionRequest:
                 to determine which Rule is applied on the Diagram in the next step.
         
         '''
-    def __init__(self,hom,rule):
+    def __init__(self,rule,hom):
         self.rule = rule
         self.charDiag = rule.D1
         self.extension = rule.D2
         self.mainDiag = hom.D2
         self.hom=hom
         
+        self.hashvalue = hash((rule.name,self.hom))
+    
+    def iter_new_Objects(self):
+        for obj in self.rule.newObjects:
+            yield obj
+    
+    def iter_new_Morphisms(self):
+        for morphi in self.rule.newMorphisms:
+            source = self.hom[morphi.source]
+            target = self.hom[morphi.target]
+            yield source,target
+    
+    def iter_new_Propertyhoms(self):
+        for prop in self.rule.newProperties:
+            yield prop.hom*self.hom
+    
+    def __hash__(self):
+        return self.hashvalue
+    
     def __call__(self):
         '''carry out the pushout of the Extension Meta-Diagram'''
         #Extend hom to a lift of the extension to the main Diagram
