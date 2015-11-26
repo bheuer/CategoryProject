@@ -140,7 +140,6 @@ def direction(morph):
             
 def latexDiag(D):
         (maxi,maxj,grid)=Grid(D)
-        print grid
         mrphs=dict()
         for morph in D.MorphismList:
             i=morph.source.gridpos[0]
@@ -151,22 +150,29 @@ def latexDiag(D):
             except:
                 mrphs[(i,j)]=[morph]
         out=""
-        print (maxi,maxj)
         for i in xrange(maxi+1):
             for j in xrange(maxj+1):
-                print (i,j)
                 if grid.has_key((i,j)):
                     out=out+grid[(i,j)].name + " "
                     if mrphs.has_key((i,j)):
                         for morph in mrphs[(i,j)]:
                             out=out+" "+r"\arrow"
-                            if(morph.style):
+                            try:
                                 out=out+r"["+morph.style+r"]"
-                            out+=r"{"+direction(morph)+r"}"
-                            if(morph.captionstyle):
+                            except:
+                                pass
+                            try:
+                                out+=r"{"+direction(morph)+r"}"
+                            except:
+                                raise "Cannot determine grid position of source and/or target of " + morph.name
+                            try:
                                 out+="["+morph.captionstyle+r"]"
-                            if(morph.latex):
+                            except:
+                                pass
+                            try:
                                 out+=r"{"+morph.latex+"}"
+                            except:
+                                pass
                 out=out+r" &"
             out=out+"\\\\ \n"
         return out
@@ -178,5 +184,7 @@ def test_diagBuild():
     D=diagBuild(Dtest)
     assert D.Graph.nodes().__repr__()=="[A, C, B, E, D, F]"
     assert D.Graph.edges().__repr__()=="[(A, C), (A, E), (A, D), (A, F), (C, D), (B, C), (B, F), (D, E)]"
+    newm=Morphism(D['E'],D['F'])
+    newm.style="dots"
     print latexDiag(D)
     return D
