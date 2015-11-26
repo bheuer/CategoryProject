@@ -4,9 +4,6 @@ from Homomorphism import HomomorphismIterator
 from Property import *
 from Property.base import PropertyTag
 from Rule import RuleMaster
-
-
-
 import unittest
 
 class CompositionTestCase(unittest.TestCase):

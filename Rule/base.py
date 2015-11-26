@@ -22,7 +22,8 @@ class RuleGenerator:
         for o in self.CD.Objects:
             rule.set_node_image(o,self.Extension[o.name])
         for e in self.CD.MorphismList:
-            rule.set_edge_image(e,self.Extension[e.name()])
+            print e
+            rule.set_edge_image(e,self.Extension[e.name])
         rule.postprocess()
         return rule
 
