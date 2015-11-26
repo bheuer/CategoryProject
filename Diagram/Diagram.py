@@ -28,6 +28,9 @@ class Diagram(object):
         #self.addMorphi(obj.Identity)
     
     def addMorphi(self,morph):
+        if not isinstance(morph, Morphism):
+            raise ValueError
+        
         target = morph.target
         source = morph.source
         
@@ -36,12 +39,13 @@ class Diagram(object):
         
         self.addName(morph.name)
         
-        Morph = Morphism(morph)
-        self.Morphisms[source][target].append(Morph)
-        self.MorphismList.append(Morph)
+        self.Morphisms[source][target].append(morph)
         
-        edge = self.Graph.add_edge(source,target,morphism = Morph,propertyTags = set())
-        self.InverseLookUp[Morph] = edge
+        assert morph not in self.MorphismList # inefficient. Just to be sure
+        self.MorphismList.append(morph)
+        
+        edge = self.Graph.add_edge(source,target,morphism = morph,propertyTags = set())
+        self.InverseLookUp[morph] = edge
         
         self.CommutingComponents[morph.id()]=morph.id()
     
