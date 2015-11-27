@@ -33,12 +33,16 @@ class Homomorphism:
         edges = tuple(sorted(self.edgeMap.items(),key = alphanumericSortingKey))
         return hash((nodes,edges))
     
+    def __eq__(self,hom):
+        return hash(self)==hash(hom)
+    
     def get_edge_image(self,item):
         if self.edgeMap.has_key(item):
             return self.edgeMap[item]
         elif len(item.Composition)>1:
-            morphi = self.edgeMap[item.Composition[0]]
-            for atomic in item.Composition[1:]:#inefficient
+            iterator = item.iterComposingMorphisms()
+            morphi = self.edgeMap[next(iterator)]
+            for atomic in iterator: #inefficient #it just got even more inefficient
                 morphi = morphi*self.edgeMap[atomic]
             return morphi
             
