@@ -1,6 +1,7 @@
 from Homomorphism.base import Homomorphism
 from networkx.classes.function import all_neighbors
 from networkx.algorithms.components.weakly_connected import weakly_connected_components
+from Diagram.Commute import Commute,commutes,Distinct
 
 class HomomorphismIterator:
     def __init__(self,D1,D2):
@@ -20,7 +21,36 @@ class HomomorphismIterator:
     def __iter__(self):
         self.initialize()
         for _ in self.matchComponents():
-            yield self.hom.copy()
+            #global PropertyCheck
+            if self.globalPropertyCheck():
+                yield self.hom.copy()
+    
+    def globalPropertyCheck(self):
+        for prop in self.D1.Properties:
+            if isinstance(prop,Commute):
+                #prop.Morphilist is a list of morphisms that commute in the source
+                #check that they also commute in the image
+                if not commutes([self.hom.get_edge_image(morph) for morph in prop.MorphiList]):
+                    return False
+            elif isinstance(prop, Distinct):
+                if commutes([self.hom.get_edge_image(morph) for morph in prop.MorphiList]):
+                    return False
+            else:
+                #check whether the locally matched properties glue together to match to
+                #a global property
+                
+                matched = False
+                _,node = next(prop.homomorphism.iterNodes())
+                image = self.hom[node]
+                
+                for propTag in self.G2.node[image]["propertyTags"]:
+                    if propTag.isinstanceof(prop):
+                        if self.hom*prop.homomorphism == propTag.prop.homomorphism:
+                            matched = True
+                            break
+                if not matched:
+                    return False
+        return True
     
     def doNodesMatch(self,node1,node2):
         P1 = self.G1.node[node1]["propertyTags"]
