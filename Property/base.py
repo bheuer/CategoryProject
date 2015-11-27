@@ -79,11 +79,11 @@ class Property:
 
     def registerPropertyTags(self):
         for node,image in self.homomorphism.iterNodes():
-            self.homomorphism.D2.Graph.node[image]["propertyTags"].add(PropertyTag(self.name,node.name,self.id))
+            self.homomorphism.D2.Graph.node[image]["propertyTags"].add(PropertyTag(self,node.name,self.id))
         #edgeTags not working because no edge objects   
         for morph,image in self.homomorphism.iterEdges():
             morphiname = morph.Composition[0].name
-            self.homomorphism.D2.InverseLookUp[image]["propertyTags"].add(PropertyTag(self.name,morphiname,self.id))
+            self.homomorphism.D2.InverseLookUp[image]["propertyTags"].add(PropertyTag(self,morphiname,self.id))
             
     def processPropertyInput(self,args):
         if len(args)==1 and isinstance(args[0],Homomorphism):
@@ -126,8 +126,9 @@ class Property:
 #~end of definition of class Property
 
 class PropertyTag:
-    def __init__(self,prop_name,function,property_id):
-        self.prop_name = prop_name
+    def __init__(self,prop,function,property_id):
+        self.prop = prop
+        self.prop_name = prop.name
         self.function = function
         self.property_id = property_id
     def __eq__(self,ptag2):
@@ -137,3 +138,8 @@ class PropertyTag:
         return (self.prop_name == ptag2.prop_name) and (self.function == ptag2.function)
     def __hash__(self):#we want to consider sets of properties
         return hash((self.prop_name,self.function))
+    
+    def isinstanceof(self,prop):
+        if prop.name == self.prop_name:
+            return True
+        return False
