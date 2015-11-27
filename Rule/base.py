@@ -22,7 +22,6 @@ class RuleGenerator:
         for o in self.CD.Objects:
             rule.set_node_image(o,self.Extension[o.name])
         for e in self.CD.MorphismList:
-            print e
             rule.set_edge_image(e,self.Extension[e.name])
         rule.postprocess()
         return rule
@@ -51,6 +50,8 @@ class Rule(Homomorphism):
         
         self.newMorphisms = []
         for e in self.D2.MorphismList:
+            if len(e.Composition)>1:
+                continue
             if not self.partialInverse.is_defined_on_edge(e):
                 self.newMorphisms.append(e)
         
