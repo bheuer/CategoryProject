@@ -1,16 +1,18 @@
-from Homomorphism import HomomorphismIterator
+from Homomorphism.HomomorphismIterator import HomomorphismIterator
 from ExtensionRequest import ExtensionRequest
-from Rule import ProductRule,ExistProduct
+from Rule import ProductRule,ExistProduct,ProductRuleUnique,ExistIdentity
 
 class RuleMaster:
     
     def __init__(self,diagram,prioritiser = None):
             
         self.diagram = diagram
-        self.Rules = [ExistProduct()(),ProductRule()()]#self.diagram.category.Rules
+        #self.Rules = [ExistProduct()(),ProductRule()(),ProductRuleUnique()()]#self.diagram.category.Rules
+        self.Rules = [ExistIdentity()(),ProductRule()(),ProductRuleUnique()()]#self.diagram.category.Rules
         self.ExtensionRequests = set()
         self.Prioritiser = prioritiser
         self.implemented = set()
+        
         if prioritiser is None:
             prioritiser = NoPriority
         self.Prioritiser = prioritiser
@@ -24,7 +26,7 @@ class RuleMaster:
                 if ER in self.implemented:
                     continue
                 self.ExtensionRequests.add(ER)
-        
+
         er = sorted(self.ExtensionRequests,key = CustomRuleWeight_MaxObjectPrioritiser)[0]
         print er.rule.name
         print er.hom
@@ -36,9 +38,27 @@ class RuleMaster:
 NoPriority = lambda ER:0
 
 def MaxObjectPriority(ER):
-    return max(ER.hom.D2.Objects.index(image) for _,image in ER.hom.iterNodes() if image is not None)
+    Max = -1
+    for _,image in ER.hom.iterNodes():
+        if image is not None:
+            Max = max(Max,ER.hom.D2.Objects.index(image))
+    return Max
     
-Weights = {"ProductRule":0,"ExistProduct":1}
+    
+def MaxMorphismPriority(ER):
+    Max = -1
+    for _,image in ER.hom.iterEdges():
+        if image is not None:
+            Max = max(Max,ER.hom.D2.MorphiList.index(image))
+    return Max
+    
+def MaxObjectPlusMaxMorphismPriority(ER):
+    return MaxMorphismPriority(ER)+MaxObjectPriority(ER)
+    
+Weights = {"ProductRule":1,"ExistProduct":2,"ProductRuleUnique":0,"ExistIdentity":1}
 def CustomRuleWeight_MaxObjectPrioritiser(ER,weights = Weights): #careful with default value, I know, but this should work
-    return (Weights[ER.rule.name],MaxObjectPriority(ER))
+    return (MaxObjectPriority(ER),Weights[ER.rule.name])
+    
+def CustomRuleWeight_MaxObjectPlusMaxMorphismPrioritiser(ER,weights = Weights): #careful with default value, I know, but this should work
+    return (MaxObjectPlusMaxMorphismPriority(ER),Weights[ER.rule.name])
     

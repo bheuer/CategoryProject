@@ -5,6 +5,8 @@ from Property import *
 from Property.base import PropertyTag
 from Rule import RuleMaster
 import unittest
+from Rule.RuleMaster import CustomRuleWeight_MaxObjectPrioritiser,\
+    CustomRuleWeight_MaxObjectPlusMaxMorphismPrioritiser
 
 class CompositionTestCase(unittest.TestCase):
     def runTest(self):
@@ -377,22 +379,60 @@ if __name__ == "__main__":
             assert c==1
             
             #test Properties hashable and hash only checks function, not id
-            p = PropertyTag(1,2,3)
-            q = PropertyTag(1,2,4)
+            p = PropertyTag(ProductProperty(F,G),2,3)
+            q = PropertyTag(ProductProperty(F,G),2,4)
             P = set([p])
             Q = set([q])
             assert P.issubset(Q)
-            
+    
+    def testProductUnique():
+        CD = Diagram()
+        A = Object(CD,"A")
+        B = Object(CD,"B")    
+        P = Object(CD,"P")
+        pi1 = Morphism(P,A,"pi1")
+        pi2 = Morphism(P,B,"pi2")
+        ProductProperty(pi1,pi2)
+        
+        N = Object(CD,"N")
+        f = Morphism(N,A,"f")
+        g = Morphism(N,B,"g")
+        phi1 = Morphism(N,P,"phi1")
+        phi2 = Morphism(N,P,"phi2")
+        Commute(pi1*phi1,f)
+        Commute(pi1*phi2,f)
+        Commute(pi2*phi1,g)
+        Commute(pi2*phi2,g)
+        print phi1==phi2
+        RM = RuleMaster(CD,prioritiser = CustomRuleWeight_MaxObjectPlusMaxMorphismPrioritiser)
+        for _ in xrange(3):
+            print "next implementation of a rule"
+            RM()
+        print phi1==phi2
+        #print CD.Properties
+        #print CD.MorphismList
+        print CD.Objects
+    
     def test4():
         
         D = Diagram()
         A = Object(D,"A")
-        Object(D,"B")
-        B = D["B"]
+        B = Object(D,"B")
+        AxB = Object(D,"AxB")
+        BxA = Object(D,"BxA")
+        pi1 = Morphism(AxB,A,"pi1")
+        pi2 = Morphism(AxB,B,"pi2")
+        pi1_ = Morphism(BxA,A,"pi1_")
+        pi2_ = Morphism(BxA,B,"pi2_")
+        ProductProperty(pi1,pi2)
+        ProductProperty(pi1_,pi2_)
         
-        RM = RuleMaster(D)
-        for i in xrange(5):
+        RM = RuleMaster(D,prioritiser = CustomRuleWeight_MaxObjectPlusMaxMorphismPrioritiser)
+        for i in xrange(10):
             print "next implementation of a rule"
             RM()
-            print D.Properties
-    print test4()
+            print D.MorphismList
+        print D.Properties
+        print D.MorphismList
+        print D.Objects
+    test4()

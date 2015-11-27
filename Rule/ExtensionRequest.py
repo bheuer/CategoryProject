@@ -1,4 +1,4 @@
-from Diagram import Morphism,Object
+from Diagram import Morphism,Object,Identity
 
 
 class ExtensionRequest:
@@ -85,8 +85,12 @@ class ExtensionRequest:
         for morphi in self.rule.newMorphisms:
             source = lift[morphi.source]
             target = lift[morphi.target]
-            newmorphi = Morphism(source,target)
-            lift.set_edge_image(morphi,newmorphi)
+            if isinstance(morphi,Identity):
+                newmorphi = Identity(source)
+                lift.set_edge_image(morphi,newmorphi)
+            else:
+                newmorphi = Morphism(source,target)
+                lift.set_edge_image(morphi,newmorphi)
        
         #compose characteristic homomorphism of property with lift to get
         #characteristic homomorphism in the extended main Diagram
