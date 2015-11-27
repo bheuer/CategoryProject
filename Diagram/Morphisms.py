@@ -80,8 +80,10 @@ def processMorphilist(morphis):
     return morphilist
 
 def processInputMorphisms(*args,**kwargs):
-    #takes different sorts of user input and makes it into 
-    #a list of morphisms that represent a (possibly composed) morphism
+    #Takes different sorts of user input and makes it into a list 
+    #of morphisms that represent a (possibly composed) morphism.
+    #Also makes clear that the morphism has a name which is unique
+    #wrt to the diagram the morphism lives in
     if len(args)==0:
         raise ValueError
     
@@ -113,7 +115,7 @@ def processInputMorphisms(*args,**kwargs):
     return morphilist,name
 
 class AtomicMorphism(AbstractMorphism):
-    def __init__(self,source,target,name=None):
+    def __init__(self,source,target,name):#name is not default for atomics, a valid name must be given
         AbstractMorphism.__init__(self,source,target)
         self.name = name
            
@@ -169,11 +171,14 @@ class Morphism(AbstractMorphism):
         return tuple([m.name for m in self.Composition])
     
     def __hash__(self):
-        return hash(self.id())
+        return hash((self.source,self.target,self.id()))
     
     def __eq__(self,morphi):
         if not isinstance(morphi,Morphism):
             raise ValueError
+        
+        if not self // morphi:
+            return False
         
         #technically the same thing
         if self.id() == morphi.id():
@@ -186,6 +191,10 @@ class Morphism(AbstractMorphism):
     def __neq__(self,morphi):
         return not self==morphi
     
+    def iterComposingMorphisms(self):
+        for i in self.Composition:
+            yield self.diagram[i.name]
+    
     def __repr__(self):
         s = "".join(c.__repr__()+"*" for c in self.Composition)
         s=s[:-1]
@@ -196,9 +205,9 @@ class Morphism(AbstractMorphism):
 
 class Identity(Morphism):
     def __init__(self,o):
-        self.name = "id_"+self.obj.name # should be tested for safety
-        super(Morphism,self).__init__(o,o,self.name)
+        self.name = "id_"+o.name # should be tested for safety
         self.obj = o
+        Morphism.__init__(self,o,o,self.name)
         self.diagram = o.diagram
         self.Composition=[]
     def id(self):

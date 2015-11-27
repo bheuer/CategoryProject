@@ -2,7 +2,6 @@ from collections import defaultdict
 from networkx.algorithms.isolate import is_isolate
 from Morphisms import Morphism
 from Graph import IamTiredOfNetworkxNotHavingAnEdgeObjectGraph
-from Homomorphism import Homomorphism
 
 class Diagram(object):
     def __init__(self):
@@ -47,14 +46,14 @@ class Diagram(object):
         edge = self.Graph.add_edge(source,target,morphism = morph,propertyTags = set())
         self.InverseLookUp[morph] = edge
         
-        self.CommutingComponents[morph.id()]=morph.id()
+        self.CommutingComponents[morph.name]=morph.name
     
     def __getitem__(self,item):
         for i in self.Objects:
             if i.name == item:
                 return i
         for i in self.MorphismList:
-            if len(i.id())==1 and i.id()[0]==item:
+            if i.name == item:
                 return i
         
             
@@ -75,17 +74,17 @@ class Diagram(object):
     
     def unify(self,morph1,morph2):
         '''take two Morphisms and register that they should be considered equal'''
-        
-        id1 = morph1.id()
-        id2 = morph2.id()
+        id1 = morph1.name
+        id2 = morph2.name
+        anchor = self.CommutingComponents[id2]
         for m,id3 in self.CommutingComponents.items():
-            if id3==id2:
+            if id3==anchor:
                 self.CommutingComponents[m]=id1
     
     def commutes(self,morph1,morph2):
         #treats morph1,morph2 as technically different morphisms and asks if they are known to commute
-        m_id1 = morph1.id()
-        m_id2 = morph2.id()
+        m_id1 = morph1.name
+        m_id2 = morph2.name
         if not self.CommutingComponents.has_key(m_id1) or not self.CommutingComponents.has_key(m_id2):
             return False
         return self.CommutingComponents[m_id1]==self.CommutingComponents[m_id2]
@@ -101,27 +100,4 @@ def isolatedNodes(diagram):
         if is_isolate(diagram.Graph,o):
             yield o
 
-class Commute:
-    def __init__(self,*args):
-        assert len(args)>0 and all(isinstance(i,Morphism) for i in args)
-        self.MorphiList = args
-        diagram = args[0].diagram
-        diagram.addProperty(self)
-        morph0 = self.MorphiList[0]
-        for i in xrange(1,len(self.MorphiList)):
-            morph = self.MorphiList[i]
-            assert morph // morph0
-            diagram.unify(morph0,morph)
     
-    def push_forward(self,hom):
-        assert isinstance(hom, Homomorphism)
-        return Commute(*(hom.get_edge_image(morph) for morph in self.MorphiList))
-    
-    def __repr__(self):
-        str_ = "Property 'commute' for the following morphisms:\n"
-        for morph in self.MorphiList:
-            str_+="{}\n".format(morph)
-        return str_
-            
-        
-        
