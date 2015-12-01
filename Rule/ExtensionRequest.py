@@ -52,8 +52,6 @@ class ExtensionRequest:
         self.mainDiag = hom.D2
         self.hom=hom
         
-        self.hashvalue = hash((rule.name,self.hom))
-    
     def iter_new_Objects(self):
         for obj in self.rule.newObjects:
             yield obj
@@ -68,11 +66,17 @@ class ExtensionRequest:
         for prop in self.rule.newProperties:
             yield prop.hom*self.hom
     
-    def __hash__(self):
-        return self.hashvalue
-    
     def __eq__(self,ER):
-        return hash(self)==hash(ER)
+        #Homomorphisms might turn out to be the same only later when
+        #it turns out that by Commutativity two morphisms are the same
+        #which a priori aren't.
+        #so we can't just store a hash value and compare that, but have to rely
+        #on the current equality value of morphisms in the image diagram
+        if self.rule.name != ER.rule.name:
+            return False
+        if self.hom == ER.hom:
+            return True
+        return False
     
     def implement(self):
         '''carry out the pushout of the Extension Meta-Diagram'''
@@ -97,5 +101,7 @@ class ExtensionRequest:
         for prop in self.rule.newProperties:
             prop.push_forward(lift)
                 
-                
+    def __repr__(self):
+        str_ = "ExtensionRequest by rule {} via the following homomorphism\n".format(self.rule.name)
+        return str_+str(self.hom)
                 

@@ -34,8 +34,19 @@ class Homomorphism:
         return hash((nodes,edges))
     
     def __eq__(self,hom):
-        return hash(self)==hash(hom)
-    
+        #horribly inefficient: we actually want them to be equal if 
+        #the diagrams self.D1 and hom.D1 are equal
+        #but for properties a same diagram is created all the time
+        for o,image in self.nodeMap.items():
+            if hom.get_node_image(hom.D1[o.name]).name!=image.name:
+                return False
+        
+        for e,image in self.edgeMap.items():
+            if hom.get_edge_image(hom.D1[e.name])!=image:
+                return False
+        return True
+        
+        
     def get_edge_image(self,item):
         if self.edgeMap.has_key(item):
             return self.edgeMap[item]
@@ -45,7 +56,9 @@ class Homomorphism:
             for atomic in iterator: #inefficient #it just got even more inefficient
                 morphi = morphi*self.edgeMap[atomic]
             return morphi
-            
+    
+    def get_node_image(self,item):
+        return self[item]        
     
     def is_defined_on_edge(self,edge):
         return self.edgeMap.has_key(edge)
