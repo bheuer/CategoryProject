@@ -1,0 +1,64 @@
+from Homomorphism.HomomorphismIterator import HomomorphismIterator
+from Rule.ExtensionRequest import ExtensionRequest
+from Rule.Rule import ProductRule,ExistProduct,ProductRuleUnique,ExistIdentity
+from Solver.Prioritiser import UltimateWeightPriotiser
+
+def iscontainedin(item,list_):
+    #for unhashable items that have an equality
+    for i in list_:
+        if i==item:
+            return True
+    return False
+
+class RuleMaster:
+    
+    def __init__(self,diagram,prioritiser = None):
+            
+        self.diagram = diagram
+        #self.Rules = [ExistProduct()(),ProductRule()(),ProductRuleUnique()()]#self.diagram.category.Rules
+        self.Rules = [ExistIdentity()(),ProductRule()(),ProductRuleUnique()()]#self.diagram.category.Rules
+        self.ExtensionRequests = []
+        self.Prioritiser = prioritiser
+        self.implemented = []
+        
+        if prioritiser is None:
+            prioritiser = UltimateWeightPriotiser
+        self.Prioritiser = prioritiser
+        
+    def __call__(self, numberOfExtensions = 2,verbose = False):
+        if verbose:
+            print "prepare to apply {} new rules to the diagram:".format(numberOfExtensions)
+         
+        for rule in self.Rules:
+            CD = rule.CD 
+            for hom in HomomorphismIterator(CD,self.diagram):
+                ER = ExtensionRequest(rule,hom)
+                if iscontainedin(ER,self.implemented):
+                    continue
+                if not iscontainedin(ER,self.ExtensionRequests):
+                    self.ExtensionRequests.append(ER)
+        if verbose:
+            print "{} new extension request(s) generated".format(len(self.ExtensionRequests))
+            print "prioritise extension requests"
+        
+        sortedExtensionRequests = sorted(self.ExtensionRequests,key = self.Prioritiser)
+        
+        for ruleNumber in xrange(numberOfExtensions):
+            #if there are no more extension requests, terminate
+            if not sortedExtensionRequests:
+                break
+            
+            extensionRequest = sortedExtensionRequests[ruleNumber]
+            if verbose:
+                print "apply new Rule:"
+                print extensionRequest.rule.name
+                print extensionRequest.hom
+                print "with priority value {}\n".format(self.Prioritiser(extensionRequest))
+            
+            extensionRequest.implement()
+            self.ExtensionRequests.remove(extensionRequest)
+            self.implemented.append(extensionRequest)
+        
+        self.ExtensionRequests = []
+        if verbose:
+            print "applied {} new rule(s)".format(ruleNumber)

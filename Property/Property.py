@@ -12,12 +12,14 @@ class MorphismsProperty(Property):
         
 class Epimorphism(MorphismsProperty):
     name = "epimorphism"
+    weight = -20
     
 class Monomorphism(MorphismsProperty):
     name = "epimorphism"
 
 class ProductProperty(Property):
     name = "product"
+    weight = -15
     def buildCharDiagram(self,D):
         A = Object(D,"factor1",)
         B = Object(D,"factor2")

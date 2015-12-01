@@ -8,6 +8,7 @@ def pairwise(iterable):#from http://stackoverflow.com/questions/5434891/iterate-
         return itertools.izip(a, b)
 
 class Commute:
+    weight = -30
     def __init__(self,*args):
         # check that all arguments are morphisms and aligned
         if not (len(args)>0 and all(isinstance(i,Morphism) for i in args)):
@@ -26,7 +27,7 @@ class Commute:
     
     def push_forward(self,hom):
         assert isinstance(hom, Homomorphism)
-        print [hom.get_edge_image(morph) for morph in self.MorphiList]
+        #print [hom.get_edge_image(morph) for morph in self.MorphiList]
         return Commute(*(hom.get_edge_image(morph) for morph in self.MorphiList))
     
     def __repr__(self):

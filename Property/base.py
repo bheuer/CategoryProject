@@ -52,6 +52,7 @@ class Property:
     
     homomorphism = None
     name = None
+    weight = 0
     def __init__(self,*args):
         self.charDiagram = Diagram()
         self.buildCharDiagram(self.charDiagram)

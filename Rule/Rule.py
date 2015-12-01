@@ -1,10 +1,11 @@
 from Property import ProductProperty
 from Diagram import Morphism,Object,Commute,Distinct,Identity
 from base import RuleGenerator
+from Homomorphism.base import Homomorphism
 
 class ExistIdentity(RuleGenerator):
     def CharacteristicDiagram(self,CD):
-        A = Object(CD,"A")
+        Object(CD,"A")
     
     def conclude(self,CD):
         Identity(CD["A"])
