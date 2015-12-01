@@ -188,8 +188,8 @@ class Morphism(AbstractMorphism):
         if self.diagram.commutes(self,morphi):
             return True
     
-    def __neq__(self,morphi):
-        return not self==morphi
+    def __ne__(self,morphi):
+        return not self.__eq__(morphi)
     
     def iterComposingMorphisms(self):
         for i in self.Composition:
