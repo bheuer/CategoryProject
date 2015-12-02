@@ -164,14 +164,18 @@ class Morphism(AbstractMorphism):
         if self.Composition==[]:
             assert source==target
         
+        #this is pretty expensive, so cache value for later use in __hash__
+        self.hashvalue = hash((self.source,self.target,tuple([m.name for m in self.Composition])))
+        
         if not "dry" in kwargs:
             self.diagram.addMorphi(self)
     
     def id(self):
-        return tuple([m.name for m in self.Composition])
+        raise DeprecationWarning
+        raise NotImplementedError
     
     def __hash__(self):
-        return hash((self.source,self.target,self.id()))
+        return self.hashvalue
     
     def __eq__(self,morphi):
         if not isinstance(morphi,Morphism):
@@ -181,8 +185,9 @@ class Morphism(AbstractMorphism):
             return False
         
         #technically the same thing
-        if self.id() == morphi.id():
-            return True
+        if len(self.Composition)==len(morphi.Composition):#this is a bit more efficient. Profilin said better optimise.
+            if all(m1.name==m2.name for m1,m2 in zip(self.Composition,morphi.Composition)):
+                return True
 
         #known to commute
         if self.diagram.commutes(self,morphi):
