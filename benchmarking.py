@@ -14,13 +14,13 @@ def test():
     ProductProperty(f,g)
     
     RM = RuleMaster(D,prioritiser = UltimateWeightPriotiser)
-    for i in xrange(5):
-        RM(verbose = True)
+    for i in xrange(10):
+        RM(verbose=True)
         print D.MorphismList
     print D.Properties
     print D.MorphismList
     print D.Objects
 
-test() 
-#from cProfile import run
-#run("test()")
+
+from cProfile import run
+run("test()")

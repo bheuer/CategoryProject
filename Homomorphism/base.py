@@ -17,22 +17,6 @@ class Homomorphism:
     def __setitem__(self,ind,val):
         self.nodeMap[ind] = val
     
-    def __hash__(self):
-        #So Dictionaries aren't hashable. We need to tuplelize them first,
-        #that is, transform them in a tuple (key,value)
-        #Moreover, dictionaries aren't order-safe. So we can't just iterate
-        #and tuplelize whatever we find.
-        #Instead, we sort the keys alphanumerically by their names
-        #(that is, Object with name "A" < Object with name "B")
-        #then, we can hash (ordered entries of node map, ordered entries of edge map)
-        #I know this doesn't work for more general Graph Homomorphisms but I'm tired and also
-        #WE ARE WRITING THIS ONLY FOR CATEGORIES, OK!?
-        
-        alphanumericSortingKey = lambda (a,b):a.name
-        nodes = tuple(sorted(self.nodeMap.items(),key = alphanumericSortingKey))
-        edges = tuple(sorted(self.edgeMap.items(),key = alphanumericSortingKey))
-        return hash((nodes,edges))
-    
     def __eq__(self,hom):
         #horribly inefficient: we actually want them to be equal if 
         #the diagrams self.D1 and hom.D1 are equal
@@ -121,12 +105,12 @@ class Homomorphism:
     
     def __repr__(self):
         str_ = ""
-        str_+= "Nodes:\n"
+        str_+= "| Nodes:\n"
         for obj in self.D1.Objects:
-            str_+="  {} -> {}\n".format(obj, self.nodeMap.get(obj))
-        str_+="Edges:\n"
+            str_+="|  {} -> {}\n".format(obj, self.nodeMap.get(obj))
+        str_+="| Edges:\n"
         for edge in self.D1.MorphismList:
-            str_+= "  ({}) -> ({})\n".format(edge,self.edgeMap.get(edge))
+            str_+= "|  ({}) -> ({})\n".format(edge,self.edgeMap.get(edge))
         return str_
     
 def copyDictWithoutCopyingEntries(dic):
