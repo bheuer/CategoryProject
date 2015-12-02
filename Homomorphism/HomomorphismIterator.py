@@ -16,7 +16,14 @@ class HomomorphismIterator:
         #for each connected component give one arbitrary representative
         self.componentRepresentatives = []
         for G in weakly_connected_components(self.G1):
-            self.componentRepresentatives.append(G.pop())
+            #find out which node has the least matching images
+            #this should be a good node to start with and then extend homomorphism from there
+            nodes = []
+            for n in G:
+                nodes.append((sum(1 for n2 in self.G2 if self.doNodesMatch(n, n2)),n))
+            optimalNode = min(nodes)[1]
+            
+            self.componentRepresentatives.append(optimalNode)
         
     def __iter__(self):
         self.initialize()
@@ -48,6 +55,7 @@ class HomomorphismIterator:
                         if self.hom*prop.homomorphism == propTag.prop.homomorphism:
                             matched = True
                             break
+
                 if not matched:
                     return False
         return True
@@ -80,8 +88,10 @@ class HomomorphismIterator:
     
     def matchNode(self,node):
         neighbourlist = [n for n in all_neighbors(self.G1,node) if self.hom.nodeMap.get(n) is None]
-        for _ in self.matchNeighbourhood(list(self.G1.out_edges(node)),mode = "out"):
-            for _ in self.matchNeighbourhood(list(self.G1.in_edges(node)),mode = "in"):
+        out_edges = [e for e in self.G1.out_edges(node) if len(e["morphism"].Composition)==1]
+        in_edges = [e for e in self.G1.in_edges(node) if len(e["morphism"].Composition)==1]
+        for _ in self.matchNeighbourhood(out_edges,mode = "out"):
+            for _ in self.matchNeighbourhood(in_edges,mode = "in"):
                 for _ in self.matchList(neighbourlist):
                     yield None
     
@@ -117,7 +127,6 @@ class HomomorphismIterator:
                     iter_ = self.G2.iterate_edges(node2,neighbour2)
                 elif mode=="in":
                     iter_ = self.G2.iterate_edges(neighbour2,node2)
-                
                 for edge2 in iter_:
                     if self.doEdgesMatch(edge, edge2):
                         morphi2 = edge2["morphism"]
@@ -139,10 +148,8 @@ class HomomorphismIterator:
             potential_images = self.G2.out_edges(node2)
         
         for edge2 in potential_images:
-            
             inneighbour2,outneighbour2 = edge2.source,edge2.target
             morphi2 = edge2["morphism"]
-            
             neighbour2 = (outneighbour2 if mode=="out" else inneighbour2)
             
             if not self.doNodesMatch(neighbour, neighbour2):
