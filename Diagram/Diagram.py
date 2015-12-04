@@ -77,9 +77,10 @@ class Diagram(object):
         id1 = morph1.name
         id2 = morph2.name
         anchor = self.CommutingComponents[id2]
+        newanchor = self.CommutingComponents[id1]
         for m,id3 in self.CommutingComponents.items():
             if id3==anchor:
-                self.CommutingComponents[m]=id1
+                self.CommutingComponents[m]=newanchor
     
     def commutes(self,morph1,morph2):
         #treats morph1,morph2 as technically different morphisms and asks if they are known to commute
