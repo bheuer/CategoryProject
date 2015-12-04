@@ -118,11 +118,72 @@ def Grid(D):
     maxi=0
     maxj=0
     for obj in D.Objects:
-        maxi=max(obj.gridpos[0],maxi)
-        maxj=max(obj.gridpos[1],maxj)
-        grid[obj.gridpos]=obj
+        try:
+            maxi=max(obj.gridpos[0],maxi)
+            maxj=max(obj.gridpos[1],maxj)
+            grid[obj.gridpos]=obj
+        except:
+            pass
     return (maxi,maxj,grid)
+
+def norm(v):
+    return v[0]*v[0]+v[1]*v[1]
+
+def spiral(v):
+    w=v
+    incr=1
+    turn=0
+    drn=(1,0)
+    while(1):
+        for s in xrange(incr):
+            w=(w[0]+drn[0],w[1]+drn[1])
+            yield w
+        drn[0]=-drn[1]
+        drn[1]=drn[0]
+        turn=turn+1
+        if (turn % 2)==0:
+            incr+=1
+            
+def badness(pos,neighbours):
+    return sum([norm(pos-nb) for nb in neighbours])
+
+def getNewPos(grid,meanpos):
+    for pos in spiral(meanpos):
+        print pos
+        if pos[0] >=0 and pos[1] >= 0 and not(grid.has_key(pos)):
+            return pos
         
+        
+def Display(obj, D):
+    neighbours=[]
+    Sum=(0,0)
+    for x in D.Graph.neighbors(obj):
+        print x
+        try:
+            Sum = (Sum[0]+x.gridpos[0],Sum[1]+x.gridpos[1])
+            print "sum=", Sum
+        except:
+            pass
+    meanpos=(int(round(Sum[0])),int(round(Sum[1])))
+    print "meanpos", meanpos
+    obj.gridpos=getNewPos(Grid(D)[2],meanpos)
+    print obj.gridpos
+
+def Hide(obj):
+    del obj.gridpos
+
+def DisplayAll(obj,D):
+    for x in D.Objects:
+        Display(x,D)
+
+def DisplayMorphism:
+    for m in D.MorphismList:
+        m.hide=False
+
+def HideMorphism:
+    for m in D.MorphismList:
+        m.hide=True
+    
 def direction(morph):
     '''returns the vector corresponding to the morphism'''
     right=morph.target.gridpos[1]-morph.source.gridpos[1]
@@ -156,6 +217,8 @@ def latexDiag(D):
                     out=out+grid[(i,j)].name + " "
                     if mrphs.has_key((i,j)):
                         for morph in mrphs[(i,j)]:
+                            if morph.hasattr('hide') and morph.hide==True:
+                                continue
                             out=out+" "+r"\arrow"
                             try:
                                 out=out+r"["+morph.style+r"]"
@@ -163,8 +226,9 @@ def latexDiag(D):
                                 pass
                             try:
                                 out+=r"{"+direction(morph)+r"}"
-                            except:
-                                raise "Cannot determine grid position of source and/or target of " + morph.name
+                            except BaseException as E:
+                                print "Cannot determine grid position of source and/or target of " + morph.name
+                                raise E
                             try:
                                 out+="["+morph.captionstyle+r"]"
                             except:
@@ -180,11 +244,14 @@ def latexDiag(D):
         
 
 def test_diagBuild():
-    Dtest=r"&A\arrow{ldd}[swap]{f}\arrow{rd}[description]{c}\arrow{rrd}[description]{d}\arrow{rrrd}[description]{e}\\&B\arrow{ld}\arrow{r}&C\arrow{r}&D\arrow{r}&E\\F"
+    Dtest=r"&A\arrow[dotted]{ldd}[swap]{f}\arrow{rd}[description]{c}\arrow{rrd}[description]{d}\arrow{rrrd}[description]{e}\\&B\arrow{ld}\arrow{r}&C\arrow{r}&D\arrow{r}&E\\F"
     D=diagBuild(Dtest)
     assert D.Graph.nodes().__repr__()=="[A, C, B, E, D, F]"
     assert D.Graph.edges().__repr__()=="[(A, C), (A, E), (A, D), (A, F), (C, D), (B, C), (B, F), (D, E)]"
     newm=Morphism(D['E'],D['F'])
-    newm.style="dots"
+    newm.style="dotted"
+    Object(D,'G')
+    Display(D['G'],D)
+    Morphism(D['G'],D['A'])
     print latexDiag(D)
     return D
