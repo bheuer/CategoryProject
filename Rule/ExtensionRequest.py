@@ -83,8 +83,19 @@ class ExtensionRequest:
         #Extend hom to a lift of the extension to the main Diagram
         lift = self.hom*self.rule.partialInverse #inefficient
         for obj in self.rule.newObjects:
-            newobj = Object(self.mainDiag)
+            try:
+                names=[]
+                for s in obj.namescheme[1]:
+                    try:
+                        names.append(self.mainDiag[s].name)
+                    except:                 #no such object, maybe a morphism?
+                        names.append(self.mainDiag.Morphisms[s].name)
+                newname=obj.namescheme[0].format(*names)
+                newobj = Object(self.mainDiag,self.mainDiag.giveName(mode=newname))   #try naming according to scheme
+            except:
+                newobj = Object(self.mainDiag)           #give a generic name
             lift.set_node_image(obj,newobj)
+
         
         for morphi in self.rule.newMorphisms:
             source = lift[morphi.source]

@@ -19,6 +19,7 @@ class ExistProduct(RuleGenerator):
         A = CD["A"]
         B = CD["B"]
         AxB = Object(CD,"AxB")
+        AxB.namescheme=('{}x{}',('A','B')) #this should be a pair (format string,tuple of names in chardiag), names from main diagram will be substitued when rule is implemented
         pi1 = Morphism(AxB,A,"pi1")
         pi2 = Morphism(AxB,B,"pi2")
         ProductProperty(pi1,pi2)
@@ -48,6 +49,9 @@ class ProductRule(RuleGenerator):
         phi = Morphism(D["N"],D["P"],"phi")
         Commute(D["f"],D["pi1"]*phi)
         Commute(D["g"],D["pi2"]*phi)
+        
+
+    
         
 class ProductRuleUnique(RuleGenerator):
     def CharacteristicDiagram(self,CD):
