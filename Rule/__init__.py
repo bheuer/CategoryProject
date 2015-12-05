@@ -1,2 +1,2 @@
 from base import Rule
-from RuleMaster import RuleMaster
+#from RuleMaster import RuleMaster
