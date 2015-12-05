@@ -87,13 +87,32 @@ class ExtensionRequest:
                 names=[]
                 for s in obj.namescheme[1]:
                     try:
-                        names.append(self.mainDiag[s].name)
+                        names.append(self.hom[self.charDiag[s]].name)
                     except:                 #no such object, maybe a morphism?
-                        names.append(self.mainDiag.Morphisms[s].name)
+                        names.append(self.hom[self.charDiag.Morphisms[s]].name)
                 newname=obj.namescheme[0].format(*names)
-                newobj = Object(self.mainDiag,self.mainDiag.giveName(mode=newname))   #try naming according to scheme
+                newobj = Object(self.mainDiag,newname)   #try naming according to scheme
             except:
-                newobj = Object(self.mainDiag)           #give a generic name
+                try:
+                    newobj=Object(self.mainDiag,self.mainDiag.giveName(mode=newname)) #append a number to name if this failed
+                except:
+                    newobj = Object(self.mainDiag)           #give a generic name if everything fails
+            latexlist=[]
+            try:
+                for s in obj.latexscheme[1]:
+                    try:
+                        try:
+                            latexlist.append(self.hom[self.charDiag[s]].latex)
+                        except:
+                            latexlist.append(self.hom[self.charDiag[s]].name)
+                    except:
+                        try:
+                            latexlist.append(self.hom[self.charDiag.Morphisms[s]].latex)
+                        except:
+                            latexlist.append(self.hom[self.charDiag.Morphisms[s]].name)
+                newobj.latex=obj.latexscheme[0].format(*latexlist)  #set LaTeX display string
+            except:
+                newobj.latex=newobj.name
             lift.set_node_image(obj,newobj)
 
         

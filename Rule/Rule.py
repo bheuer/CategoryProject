@@ -20,8 +20,12 @@ class ExistProduct(RuleGenerator):
         B = CD["B"]
         AxB = Object(CD,"AxB")
         AxB.namescheme=('{}x{}',('A','B')) #this should be a pair (format string,tuple of names in chardiag), names from main diagram will be substitued when rule is implemented
+        AxB.latexscheme=('{} \\times {}',('A','B'))
         pi1 = Morphism(AxB,A,"pi1")
         pi2 = Morphism(AxB,B,"pi2")
+        pi1.latexscheme=('',())                  #suppress morphism name display
+        pi2.latexscheme=('',())                  #suppress morphism name display
+
         ProductProperty(pi1,pi2)
 
 class ProductRule(RuleGenerator):
