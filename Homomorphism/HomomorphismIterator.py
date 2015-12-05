@@ -18,6 +18,7 @@ class HomomorphismIterator:
         for G in weakly_connected_components(self.G1):
             #find out which node has the least matching images
             #this should be a good node to start with and then extend homomorphism from there
+            
             nodes = []
             for n in G:
                 nodes.append((sum(1 for n2 in self.G2 if self.doNodesMatch(n, n2)),n))
@@ -87,9 +88,20 @@ class HomomorphismIterator:
             self.hom.nodeMap[node1]=None
     
     def matchNode(self,node):
-        neighbourlist = [n for n in all_neighbors(self.G1,node) if self.hom.nodeMap.get(n) is None]
+        
         out_edges = [e for e in self.G1.out_edges(node) if len(e["morphism"].Composition)==1]
         in_edges = [e for e in self.G1.in_edges(node) if len(e["morphism"].Composition)==1]
+        
+        neighbourlist = []
+        for e in out_edges:
+            n = e.target
+            if n not in neighbourlist and self.hom.nodeMap.get(n) is None:
+                neighbourlist.append(n)
+        for e in in_edges:
+            n = e.source
+            if n not in neighbourlist and self.hom.nodeMap.get(n) is None:
+                neighbourlist.append(n)
+        
         for _ in self.matchNeighbourhood(out_edges,mode = "out"):
             for _ in self.matchNeighbourhood(in_edges,mode = "in"):
                 for _ in self.matchList(neighbourlist):
@@ -113,7 +125,7 @@ class HomomorphismIterator:
         node,neighbour = edge.source,edge.target
         if mode=="in":
             node,neighbour = neighbour,node
-            
+        
         node2 = self.hom.nodeMap[node]
         
         morphi = edge["morphism"]
