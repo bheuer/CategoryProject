@@ -41,10 +41,14 @@ class AbstractMorphism(object):
         
         self.diagram  = self.source.diagram
     
-    def compose(self,g):
+    def compose(self,g,dry = False):
         if isinstance(g,Identity):
-            return Morphism([self])
-        return Morphism([self,g])
+            return self
+        c = Morphism([self,g],dry=True)
+        for m in self.diagram.MorphismList:
+            if m==c:
+                return m
+        return Morphism([self,g],dry=dry)
     
     def __mul__(self,g):
         return self.compose(g)
@@ -54,7 +58,7 @@ class AbstractMorphism(object):
         return self.source==morph.target
     
     def __gt__(self,morph):
-        return morph<self
+        return AbstractMorphism.__lt__(morph,self)
     
     def __floordiv__(self,morph):
         assert isinstance(morph,AbstractMorphism)
@@ -85,7 +89,14 @@ def processInputMorphisms(*args,**kwargs):
     #Also makes clear that the morphism has a name which is unique
     #wrt to the diagram the morphism lives in
     if len(args)==0:
-        raise ValueError
+        raise ValueError,"empty input"
+    elif all(i==[] for i in args):
+        raise ValueError,"empty input"
+    
+    if "dry" in kwargs:
+        dry = kwargs["dry"]
+    else:
+        dry = False
     
     if isinstance(args[-1],str):
         name = args[-1]
@@ -93,7 +104,7 @@ def processInputMorphisms(*args,**kwargs):
         name = args[-1]
     else:
         name = None
-        
+    
     if name is not None and "*" in name:
         raise ValueError,"name must not contain the symbol '*'. Seriously, I want to be nice to you and I just can't if you use it."
     
@@ -112,7 +123,7 @@ def processInputMorphisms(*args,**kwargs):
     if name is None:
         name = "*".join(morphi.name for morphi in morphilist)
     
-    return morphilist,name
+    return morphilist,name,dry
 
 class AtomicMorphism(AbstractMorphism):
     def __init__(self,source,target,name):#name is not default for atomics, a valid name must be given
@@ -143,9 +154,8 @@ class Morphism(AbstractMorphism):
         '''
     
     def __init__(self, *args, **kwargs):
-        morphilist,name = processInputMorphisms(*args,**kwargs)
+        morphilist,name,dry = processInputMorphisms(*args,**kwargs)
         self.name = name
-        
         source = morphilist[-1].source
         target = morphilist[0].target
         
@@ -166,8 +176,7 @@ class Morphism(AbstractMorphism):
         
         #this is pretty expensive, so cache value for later use in __hash__
         self.hashvalue = hash((self.source,self.target,tuple([m.name for m in self.Composition])))
-        
-        if not "dry" in kwargs:
+        if not dry:
             self.diagram.addMorphi(self)
     
     def id(self):
@@ -200,6 +209,31 @@ class Morphism(AbstractMorphism):
         for i in self.Composition:
             yield self.diagram[i.name]
     
+    def iterPartialMorphisms(self):
+        #iter all constituting partitions of self into three morphisms end*partial*star
+        l = len(self.Composition)
+        
+        for i0 in xrange(l-1):
+            if i0==0:
+                end = Identity(self.target,dry=True)
+            else:
+                end = Morphism(self.Composition[:i0],dry = True)
+            
+            yield end,Identity(end.source,dry = True),Morphism(self.Composition[i0:],dry = True)
+            
+            for i1 in xrange(i0+1,l+1):
+                if i0==0 and i1==l:continue
+                partial = Morphism(self.Composition[i0:i1],dry = True)
+                
+                if i1==l:
+                    start = Identity(self.source,dry=True)
+                else:
+                    start = Morphism(self.Composition[i1:],dry = True)
+                yield end,partial,start
+    
+    def equivalenceClass(self):
+        return self.diagram.CommutativityQuotient.get_edge_image(self)
+    
     def __repr__(self):
         s = "".join(c.__repr__()+"*" for c in self.Composition)
         s=s[:-1]
@@ -209,15 +243,15 @@ class Morphism(AbstractMorphism):
         return s
 
 class Identity(Morphism):
-    def __init__(self,o):
+    def __init__(self,o,dry = False):
         self.name = "id_"+o.name # should be tested for safety
         self.obj = o
-        Morphism.__init__(self,o,o,self.name)
+        Morphism.__init__(self,o,o,self.name,dry=dry)
         self.diagram = o.diagram
         self.Composition=[]
     def id(self):
         return ()
-    def compose(self,g):
+    def compose(self,g,dry=None):
         assert g.target == self.obj
         return g
     def __repr__(self):

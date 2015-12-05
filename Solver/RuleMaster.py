@@ -25,7 +25,7 @@ class RuleMaster:
             prioritiser = UltimateWeightPriotiser
         self.Prioritiser = prioritiser
         
-    def __call__(self, numberOfExtensions = 1,verbose = False):
+    def rule(self, numberOfExtensions = 1,verbose = False):
         if verbose:
             print "prepare to apply {} new rules to the diagram:".format(numberOfExtensions)
          
@@ -43,12 +43,16 @@ class RuleMaster:
         
         sortedExtensionRequests = sorted(self.ExtensionRequests,key = self.Prioritiser)
         
-        for ruleNumber in xrange(numberOfExtensions):
+        ruleNumber = 0
+        while ruleNumber<numberOfExtensions:
             #if there are no more extension requests, terminate
             if not sortedExtensionRequests:
                 break
             
-            extensionRequest = sortedExtensionRequests[ruleNumber]
+            extensionRequest = sortedExtensionRequests.pop(0)
+            if extensionRequest in self.implemented:
+                continue
+            
             if verbose:
                 print "________________\n\n apply new Rule:"
                 print extensionRequest.rule.name
@@ -57,9 +61,9 @@ class RuleMaster:
                         .format(self.Prioritiser(extensionRequest))
             
             extensionRequest.implement()
-            self.ExtensionRequests.remove(extensionRequest)
             self.implemented.append(extensionRequest)
-        
+            ruleNumber+=1
+            
         self.ExtensionRequests = []
         if verbose:
             print "applied {} new rules".format(ruleNumber+1)

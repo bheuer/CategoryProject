@@ -78,6 +78,9 @@ class ExtensionRequest:
             return True
         return False
     
+    def __ne__(self,ER):
+        return not self.__eq__(ER)
+    
     def implement(self):
         '''carry out the pushout of the Extension Meta-Diagram'''
         #Extend hom to a lift of the extension to the main Diagram
@@ -91,13 +94,13 @@ class ExtensionRequest:
             target = lift[morphi.target]
             if isinstance(morphi,Identity):
                 newmorphi = Identity(source)
-                lift.set_edge_image(morphi,newmorphi)
             else:
                 newmorphi = Morphism(source,target)
-                lift.set_edge_image(morphi,newmorphi)
+            lift.set_edge_image(morphi,self.mainDiag.CommutativityQuotient.get_edge_image(newmorphi))
        
         #compose characteristic homomorphism of property with lift to get
         #characteristic homomorphism in the extended main Diagram
+        #for commutativity classes, just choose an arbitrary section
         for prop in self.rule.newProperties:
             prop.push_forward(lift)
                 

@@ -30,6 +30,8 @@ class Homomorphism:
                 return False
         return True
         
+    def __ne__(self,hom):
+        return not self.__eq__(hom)   
         
     def get_edge_image(self,item):
         if self.edgeMap.has_key(item):

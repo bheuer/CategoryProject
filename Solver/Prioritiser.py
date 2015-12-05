@@ -43,8 +43,11 @@ def maxdef(iterator, default):
         max_ = max(max_,i)
     return max_
 
+def ImCommutativityClassWeight(comc,ER):
+    return min(ImMorphismIndex(f,ER) for f in comc.Morphisms)
+
 def ImMorphismWeight(ER):
-    return maxdef((ImMorphismIndex(ER.hom.get_edge_image(f),ER) for f in ER.charDiag.MorphismList),0)
+    return maxdef((ImCommutativityClassWeight(ER.hom.get_edge_image(f),ER) for f in ER.charDiag.MorphismList),0)
 
 def ImObjectWeight(ER):
     return maxdef((ImObjectIndex(ER.hom.get_node_image(o),ER) for o in ER.charDiag.Objects),0)
