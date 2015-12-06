@@ -89,7 +89,7 @@ class ExtensionRequest:
                     try:
                         names.append(self.hom[self.charDiag[s]].name)
                     except:                 #no such object, maybe a morphism?
-                        names.append(self.hom[self.charDiag.Morphisms[s]].name)
+                        names.append(self.hom.edgeMap[self.charDiag.Morphisms[s]].name)
                 newname=obj.namescheme[0].format(*names)
                 newobj = Object(self.mainDiag,newname)   #try naming according to scheme
             except:
@@ -107,9 +107,9 @@ class ExtensionRequest:
                             latexlist.append(self.hom[self.charDiag[s]].name)
                     except:
                         try:
-                            latexlist.append(self.hom[self.charDiag.Morphisms[s]].latex)
+                            latexlist.append(self.hom.edgeMap[self.charDiag.Morphisms[s]].latex)
                         except:
-                            latexlist.append(self.hom[self.charDiag.Morphisms[s]].name)
+                            latexlist.append(self.hom.edgeMap[self.charDiag.Morphisms[s]].name)
                 newobj.latex=obj.latexscheme[0].format(*latexlist)  #set LaTeX display string
             except:
                 newobj.latex=newobj.name
