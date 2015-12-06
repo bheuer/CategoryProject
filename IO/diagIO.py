@@ -2,6 +2,25 @@ from Diagram import *
 from Diagram.Morphisms import AtomicMorphism
 import re
 
+def processDiagSequence(ds):
+    out=r"""\documentclass[a4paper]{article}
+           \usepackage[english]{babel}
+           \usepackage[utf8x]{inputenc}
+           \usepackage{amsmath}
+           \usepackage{graphicx}
+           \usepackage{tikz-cd}
+           \begin{document}"""
+    prev=""
+    for tex in ds:
+        if tex==prev:
+            continue
+        out+=r"$$\begin{tikzcd}"+"\n"
+        out+=tex
+        out+=r"\end{tikzcd}$$"+"\n"
+        prev=tex
+    out+=r"\end{document}"
+    return out
+
 def breakMatrix(inp):
     '''breaks up the input LaTeX matrix into an n*k array of strings'''
     n=0

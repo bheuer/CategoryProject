@@ -3,7 +3,7 @@ from Solver.RuleMaster import RuleMaster
 from Solver.SimpleRuleMaster import SimpleRuleMaster
 from Solver.Prioritiser import UltimateWeightPriotiser
 from Property.Property import *
-from IO.diagIO import diagBuild, latexDiag, Display, DisplayAll, DisplayMorphism, DisplayAllMorphisms
+from IO.diagIO import processDiagSequence,diagBuild, latexDiag, Display, DisplayAll, DisplayMorphism, DisplayAllMorphisms
 from Rule.Rule import *
 from Homomorphism.HomomorphismIterator import HomomorphismIterator
 from Rule.ExtensionRequest import ExtensionRequest
@@ -29,27 +29,7 @@ def test():
         SRM(verbose=True)
     return D
 
-
-def processDiagSequence(ds):
-    out=r"""\documentclass[a4paper]{article}
-           \usepackage[english]{babel}
-           \usepackage[utf8x]{inputenc}
-           \usepackage{amsmath}
-           \usepackage{graphicx}
-           \usepackage{tikz-cd}
-           \begin{document}"""
-    prev=""
-    for tex in ds:
-        if tex==prev:
-            continue
-        out+=r"$$\begin{tikzcd}"+"\n"
-        out+=tex
-        out+=r"\end{tikzcd}$$"+"\n"
-        prev=tex
-    out+=r"\end{document}"
-    return out
-
-def test2():        #fails because SimpleRuleMaster cannot do a composition yet
+def test2():        
     D=Diagram()
     P1=Object(D,'P1')
     P1.latex='P_1'
@@ -58,25 +38,15 @@ def test2():        #fails because SimpleRuleMaster cannot do a composition yet
 
     id1=Identity(P1)
     id2=Identity(P2)
-    print id1.name
     
     P1xP2=Object(D,'P1xP2')
     P1xP2.latex="P_1 \oplus P_2"
 
     idprod=Identity(P1xP2)
-    print idprod.name
     
-#    pi1=Morphism(P1xP2,P1,'pi1')
-#    pi2=Morphism(P1xP2,P2,'pi2')
     i1=Morphism(P1,P1xP2,'i1')
     i2=Morphism(P2,P1xP2,'i2')
-#    ProductProperty(pi1,pi2)
     CoProductProperty(i1,i2)
-
-    
-
-#    Commute(pi1*i1,id1)
-#    Commute(pi2*i2,id2)
     
     B=Object(D,'B')
     C=Object(D,'C')
@@ -102,7 +72,7 @@ def test2():        #fails because SimpleRuleMaster cannot do a composition yet
     SRM = SimpleRuleMaster(D,maxMorphisms=1)
     diagSequence=[]
     while(True):
-        result=SRM(numberOfExtensions=10,verbose=True,printlatex=True)
+        result=SRM(numberOfExtensions=10,verbose=False,printlatex=True)
         if (result==False):
             break
         diagSequence.append(result)
@@ -110,5 +80,4 @@ def test2():        #fails because SimpleRuleMaster cannot do a composition yet
     return D
 
 D=test2()
-#DisplayAll(D)
 

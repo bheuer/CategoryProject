@@ -125,20 +125,7 @@ class ExtensionRequest:
             if isinstance(morphi,Identity):
                 newmorphi = Identity(source)
             else:
-                try:
-                    names=[]
-                    for s in morphi.namescheme[1]:
-                        try:
-                            names.append(self.hom[self.charDiag[s]].name)
-                        except:                 #no such object, maybe a morphism?
-                            names.append(self.hom.edgeMap[self.charDiag.Morphisms[s]].name)
-                    newname=morphi.namescheme[0].format(*names)
-                    newmorphi = Morphism(morphi.source,morphi.target,newname)   #try naming according to scheme
-                except:
-                    try:
-                        newmorphi=Morphism(source,target,self.mainDiag.giveName(mode=newname)) #append a number to name if this failed
-                    except:
-                        newmorphi = Morphism(source,target)           #give a generic name if everything fails
+                newmorphi = Morphism(source,target)           #do not implement nameschemes for morphisms for now
                 latexlist=[]
                 try:
                     for s in morphi.latexscheme[1]:
@@ -149,9 +136,9 @@ class ExtensionRequest:
                                 latexlist.append(self.hom[self.charDiag[s]].name)
                         except:
                             try:
-                                latexlist.append(self.hom.edgeMap[self.charDiag.Morphisms[s]].latex)
+                                latexlist.append(self.hom.edgeMap[self.charDiag[s]].representative.latex)
                             except:
-                                latexlist.append(self.hom.edgeMap[self.charDiag.Morphisms[s]].name)
+                                latexlist.append(self.hom.edgeMap[self.charDiag[s]].representative.name)
                     newmorphi.latex=morphi.latexscheme[0].format(*latexlist)  #set LaTeX display string
                 except:
                     pass
