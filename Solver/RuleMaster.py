@@ -1,6 +1,6 @@
 from Homomorphism.HomomorphismIterator import HomomorphismIterator
 from Rule.ExtensionRequest import ExtensionRequest
-from Rule.Rule import ProductRule,ExistProduct,ProductRuleUnique,ExistIdentity
+from Rule import ProductRule,ExistProduct,ProductRuleUnique,ExistIdentity
 from Rule.Compose import ComposeRule, ComposeRequest
 from Solver.Prioritiser import UltimateWeightPriotiser
 from Diagram.Diagram import iscontainedin
@@ -13,7 +13,7 @@ class RuleMaster:
         #self.Rules = [ExistProduct()(),ProductRule()(),ProductRuleUnique()()]#self.diagram.category.Rules
         self.Rules = Rules
         if Rules is None:
-            self.Rules = [ExistIdentity()(),ProductRule()(),ProductRuleUnique()(),ComposeRule()]#self.diagram.category.Rules
+            self.Rules = [ExistIdentity,ProductRule,ProductRuleUnique,ComposeRule]#self.diagram.category.Rules
         self.ExtensionRequests = []
         self.Prioritiser = prioritiser
         self.implemented = []

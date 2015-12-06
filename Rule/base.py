@@ -3,6 +3,7 @@ from Diagram import Diagram
 
 #abstract base class
 class RuleGenerator:
+    RuleName = None
     def __init__(self):
         self.CD = Diagram()
         self.Extension = Diagram()

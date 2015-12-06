@@ -3,7 +3,7 @@ from Solver.RuleMaster import RuleMaster
 from Solver.Prioritiser import UltimateWeightPriotiser
 from Property.Property import ProductProperty
 from IO.diagIO import diagBuild, latexDiag, Display, DisplayAll, DisplayMorphism, DisplayAllMorphisms
-from Rule.Rule import *
+from Rule import *
 from Homomorphism.HomomorphismIterator import HomomorphismIterator
 from Rule.ExtensionRequest import ExtensionRequest
 
@@ -18,7 +18,7 @@ def test():
     f1.name="f1"
     f1.latex=r"\phi"
 
-    rule=ExistProduct()()
+    rule=ExistProduct
     homs=HomomorphismIterator(rule.CD,D)
     ers=[]
     for hom in homs:

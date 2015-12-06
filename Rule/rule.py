@@ -2,15 +2,17 @@ from Property import ProductProperty
 from Diagram import Morphism,Object,Commute,Distinct,Identity
 from base import RuleGenerator
 from Homomorphism.base import Homomorphism
+from Property.Property import Monomorphism
 
-class ExistIdentity(RuleGenerator):
+class ExistIdentityGenerator(RuleGenerator):
+    RuleName = "ExistIdentity"
     def CharacteristicDiagram(self,CD):
         Object(CD,"A")
     
     def conclude(self,CD):
         Identity(CD["A"])
 
-class ExistProduct(RuleGenerator):
+class ExistProductGenerator(RuleGenerator):
     def CharacteristicDiagram(self,CD):
         self.A = Object(CD,"A")
         self.B = Object(CD,"B")
@@ -28,7 +30,7 @@ class ExistProduct(RuleGenerator):
 
         ProductProperty(pi1,pi2)
 
-class ProductRule(RuleGenerator):
+class ProductRuleGenerator(RuleGenerator):
     def CharacteristicDiagram(self,CD):
         '''
                 N
@@ -57,7 +59,7 @@ class ProductRule(RuleGenerator):
 
     
         
-class ProductRuleUnique(RuleGenerator):
+class ProductRuleUniqueGenerator(RuleGenerator):
     def CharacteristicDiagram(self,CD):
         '''
                 N
@@ -93,7 +95,7 @@ class ProductRuleUnique(RuleGenerator):
         Commute(D["phi2"],D["phi1"])
 
 
-class EpimorphismRule(RuleGenerator):
+class EpimorphismRuleGenerator(RuleGenerator):
     def CharacteristicDiagram(self,CD):
         ''' 
                 g1
@@ -106,6 +108,7 @@ class EpimorphismRule(RuleGenerator):
         B = Object(CD,"B")
         C = Object(CD,"C")
         f = Morphism(A,B,"f")
+        Monomorphism(f)
         g1 = Morphism(B,C,"g1")
         g2 = Morphism(B,C,"g2")
         Distinct(g1,g2)
@@ -115,4 +118,35 @@ class EpimorphismRule(RuleGenerator):
         g1 = CD["g1"]
         g2 = CD["g2"]
         Commute(g1,g2)
+
+class MonomorphismRuleGenerator(RuleGenerator):
+    def CharacteristicDiagram(self,CD):
+        ''' 
+           f1
+          ---->
+         A     B --> C
+          ---->
+           f2
+        '''
+        A = Object(CD,"A")
+        B = Object(CD,"B")
+        C = Object(CD,"C")
+        f1 = Morphism(A,B,"f1")
+        f2 = Morphism(A,B,"f2")
+        g = Morphism(B,C,"g")
+        Monomorphism(g)
+        Distinct(f1,f2)
+        Commute(g*f1,g*f2)
+    
+    def conclude(self,CD):
+        f1 = CD["f1"]
+        f2 = CD["f2"]
+        Commute(f1,f2)
         
+#this is just so that Ben's IDE knows what they are
+#IDEs don't read execs
+        
+MonomorphismRule = MonomorphismRuleGenerator()()
+EpimorphismRule  = EpimorphismRuleGenerator()()
+ProductRule = ProductRuleGenerator()()
+ExistProduct = ExistProductGenerator()()

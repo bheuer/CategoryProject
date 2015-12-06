@@ -18,7 +18,7 @@ extension.set_node_image(C, C)
 extension.set_edge_image(F, F)
 extension.set_edge_image(G, G)
 
-class ComposeRule(Rule):
+class ComposeRuleClass(Rule):
     name = "ComposeRule"
     def __init__(self):
         Homomorphism.__init__(self,CD,CD)
@@ -49,4 +49,5 @@ class ComposeRequest(ExtensionRequest):
     def implement(self):
         #print "HIER",self.f,self.g
         self.FC.representative*self.GC.representative
-        
+
+ComposeRule = ComposeRuleClass()

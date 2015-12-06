@@ -15,3 +15,8 @@ class Object(object):
         return self.name
     def __hash__(self):
         return self.name.__hash__()
+    
+    def Identity(self):
+        label = "id_"+self.name
+        morph = self.diagram[label]
+        return morph

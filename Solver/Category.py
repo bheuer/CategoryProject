@@ -1,4 +1,4 @@
-from Rule.Rule import ProductRuleUnique
+from Rule.rule import ProductRuleUnique
 
 class Category:
     def __init__(self,name,setOfRules,setOfDistinguishedObjects,inheritFrom = None):
