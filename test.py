@@ -7,7 +7,9 @@ from Solver import RuleMaster
 import unittest
 from Property.TestPrioritiser import CustomRuleWeight_MaxObjectPlusMaxMorphismPrioritiser
 from Solver.Prioritiser import UltimateWeightPriotiser
-from Rule.Rule import EpimorphismRule
+from Rule import EpimorphismRule, MonomorphismRule, ExistIdentity,\
+    ProductRuleUnique
+from Rule.Compose import ComposeRule
 
 class CompositionTestCase(unittest.TestCase):
     def runTest(self):
@@ -162,87 +164,105 @@ class MonomEpiTestCase(unittest.TestCase):
         h2 = Morphism(B2,B3,"h2")
         h3 = Morphism(B3,B4,"h3")
          
+        RM = RuleMaster(D,prioritiser = UltimateWeightPriotiser,Rules=[EpimorphismRule,MonomorphismRule,ComposeRule])
+        
         Commute(g2*f1*f0,h1*g1*f0)
-         
-         
         assert g2*f1*f0==h1*g1*f0
         assert g2*f1!=h1*g1
+        RM.rule_exhaustively()
+        assert g2*f1!=h1*g1
+        
+        #Epimorphism Test
+        
         Epimorphism(f0)
-        RM = RuleMaster(D,prioritiser = UltimateWeightPriotiser,Rules=[EpimorphismRule()()])
-        RM.rule_exhaustively(verbose = True)
+        
+        RM.rule_exhaustively()
+        
         assert g2*f1==h1*g1
+        
+        #Monomorphism Test
+        
         assert g3*f2!=h2*g2
         Commute(h3*g3*f2,h3*h2*g2)
+        RM.rule_exhaustively()
         assert g3*f2!=h2*g2
         
-        #Monomorphism(h3)
-        #RM.rule_exhaustively(verbose = True)
-        #assert g3*f2==h2*g2
-        #assert g3*f2*f1==h2*h1*g1
+        Monomorphism(h3)
+        RM.rule_exhaustively()
+        assert g3*f2==h2*g2
+        assert g3*f2*f1==h2*h1*g1
      
-#===============================================================================
-# class CyclesTestCase(unittest.TestCase):
-#     def runTest(self):
-#         D = Diagram()
-#          
-#         '''
-#             f1
-#         A1 <---  A2
-#         |        A
-#         | g1 //  | g2
-#         V        |
-#         B1 ---> B2
-#             h1
-#          
-#         '''
-#         A1 = Object(D,"A1")
-#         A2 = Object(D,"A2")
-#         B1 = Object(D,"B1")
-#         B2 = Object(D,"B2")
-#          
-#          
-#         f1 = Morphism(A2,A1,"f1")
-#         g1 = Morphism(A1,B1,"g1")
-#         h1 = Morphism(B1,B2,"h1")
-#         g2 = Morphism(B2,A2,"g2")
-#          
-#         loop =  f1*g2*h1*g1
-#         assert loop!=A1.Identity
-#         Commute(loop,A1.Identity)
-#         assert loop==A1.Identity
-#  
-# class ProductTestCase(unittest.TestCase):
-#     def runTest(self):
-#         D = Diagram()
-#          
-#         '''
-#             V
-#           f :| g
-#             :| 
-#             P         product
-#        pi1 / \ pi2
-#           /   \
-#          A     B
-#           
-#         '''
-#          
-#         A = Object(D,"A")
-#         B = Object(D,"B")
-#         P = Object(D,"P")
-#         V = Object(D,"V")
-#          
-#         pi1 = Morphism(P,A,"pi1")
-#         pi2 = Morphism(P,B,"pi2")
-#         f = Morphism(V,P,"f")
-#         g = Morphism(V,P,"g")
-#      
-#         ProductProperty(pi1,pi2)
-#         Commute(pi2*f,pi2*g)
-#          
-#         assert f!=g
-#         Commute(pi1*f,pi1*g)
-#         assert f==g
-#===============================================================================
+class CycleTestCase(unittest.TestCase):
+    def runTest(self):
+        D = Diagram()
+          
+        '''
+            f1
+        A1 <---  A2
+        |        A
+        | g1 //  | g2
+        V        |
+        B1 ---> B2
+            h1
+          
+        '''
+        A1 = Object(D,"A1")
+        A2 = Object(D,"A2")
+        B1 = Object(D,"B1")
+        B2 = Object(D,"B2")
+          
+          
+        f1 = Morphism(A2,A1,"f1")
+        g1 = Morphism(A1,B1,"g1")
+        h1 = Morphism(B1,B2,"h1")
+        g2 = Morphism(B2,A2,"g2")
+        
+        RM = RuleMaster(D,prioritiser = UltimateWeightPriotiser,Rules=[ExistIdentity])
+        RM.rule_exhaustively()
+        
+        id_A1 = A1.Identity()
+        loop =  f1*g2*h1*g1
+        assert loop!=id_A1
+        Commute(loop,id_A1)
+        assert loop==id_A1
+        assert loop*loop==id_A1
+  
+class ProductTestCase(unittest.TestCase):
+    def runTest(self):
+        D = Diagram()
+          
+        '''
+            V
+          f :| g
+            :| 
+            P         product
+       pi1 / \ pi2
+          /   \
+         A     B
+           
+        '''
+          
+        A = Object(D,"A")
+        B = Object(D,"B")
+        P = Object(D,"P")
+        V = Object(D,"V")
+          
+        pi1 = Morphism(P,A,"pi1")
+        pi2 = Morphism(P,B,"pi2")
+        f = Morphism(V,P,"f")
+        g = Morphism(V,P,"g")
+      
+        ProductProperty(pi1,pi2)
+        
+        RM = RuleMaster(D,Rules = [ProductRuleUnique])
+        
+        Commute(pi2*f,pi2*g)
+        RM.rule_exhaustively()
+        assert f!=g
+        
+        Commute(pi1*f,pi1*g)
+        RM.rule_exhaustively()
+        assert f==g
 
 class RuleMasterTest(unittest.TestCase):
     def runTest(self):
