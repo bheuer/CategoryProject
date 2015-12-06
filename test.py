@@ -259,13 +259,10 @@ class RuleMasterTest(unittest.TestCase):
         ProductProperty(pi1_,pi2_)
         
         RM = RuleMaster(D,prioritiser = UltimateWeightPriotiser)
-        for i in xrange(5):
-            print "next implementation of a rule"
-            RM.rule(numberOfExtensions=2)#, verbose = True)
-            
-        print D.Properties
-        print D.MorphismList
-        print D.Objects
+        RM.rule_exhaustive(numberOfExtensions=2)
+        
+        assert D["m2*m1"]==D["id_BxA"]
+        assert D["m1*m2"]==D["id_AxB"]
         
 if False:#__name__ == "__main__":
     def test1():
