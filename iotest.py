@@ -8,7 +8,6 @@ from Homomorphism.HomomorphismIterator import HomomorphismIterator
 from Rule.ExtensionRequest import ExtensionRequest
 
 
-
 def test():
     '''constructs and displays all products of two objects'''
     D = Diagram()

@@ -1,17 +1,25 @@
 from Homomorphism import Homomorphism
-from Diagram import Diagram
+from Diagram import Diagram,Category,GenericCategory
 
 #abstract base class
 class RuleGenerator:
     RuleName = None
+    category = GenericCategory
     def __init__(self):
-        self.CD = Diagram()
-        self.Extension = Diagram()
+        self.CD = Diagram(self.category)
+        self.Extension = Diagram(self.category)
         
         self.CharacteristicDiagram(self.CD)
         self.CharacteristicDiagram(self.Extension)
         
         self.conclude(self.Extension)
+        
+        name = self.RuleName
+        if name is None:
+            name = self.__class__.__name__
+            if name.endswith("Generator"):
+                name[:-9]
+        self.RuleName = name
         
     def CharacteristicDiagram(self,CD):
         raise NotImplementedError
@@ -19,7 +27,7 @@ class RuleGenerator:
         raise NotImplementedError  
     
     def __call__(self):
-        rule = Rule(self.CD,self.Extension,name = self.__class__.__name__)
+        rule = Rule(self.CD,self.Extension,name = self.RuleName)
         for o in self.CD.Objects:
             rule.set_node_image(o,self.Extension[o.name])
         for e in self.CD.MorphismList:
