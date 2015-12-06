@@ -1,4 +1,4 @@
-from Property import ProductProperty
+from Property import ProductProperty, Monomorphism, Epimorphism, Projective, Injective, CoProductProperty
 from Diagram import Morphism,Object,Commute,Distinct,Identity
 from base import RuleGenerator
 from Homomorphism.base import Homomorphism
@@ -55,9 +55,104 @@ class ProductRuleGenerator(RuleGenerator):
         phi = Morphism(D["N"],D["P"],"phi")
         Commute(D["f"],D["pi1"]*phi)
         Commute(D["g"],D["pi2"]*phi)
+
+class CoProductRule(RuleGenerator):
+    def CharacteristicDiagram(self,CD):
+        '''
+                N
+           f  / : \  g
+             |  P  |
+             | / \ |
+              A   B
+        '''
+        
+        A = Object(CD,"A")
+        B = Object(CD,"B")    
+        P = Object(CD,"P")
+        i1 = Morphism(A,P,"pi1")
+        i2 = Morphism(B,P,"pi2")
+        CoProductProperty(i1,i2)
+        
+        N = Object(CD,"N")
+        f = Morphism(A,N,"f")
+        g = Morphism(B,N,"g")
+    
+    def conclude(self,D):
+        phi = Morphism(D["P"],D["N"],"phi")
+        phi.namescheme=("{} x {}",("f","g"))
+        phi.latexscheme=("{} \\oplus {}",("f","g"))
+        Commute(D["f"],phi*D["i1"])
+        Commute(D["g"],phi*D["i2"])
         
 
-    
+class ProjectiveUP(RuleGenerator):
+    def CharacteristicDiagram(self,CD):
+        '''P -f-> C
+            /    /|\
+             \   /|\
+              \   |
+               !  pi
+                \ |
+                 \|
+                  B'''
+        B = Object(CD,"B")
+        C = Object(CD,"C")
+        P = Object(CD,"P")
+        f = Morphism(P,C,"f")
+        pi= Morphism(B,C,"pi")
+        Epimorphism(pi)
+        Projective(P)
+
+    def conclude(self,D):
+        ftilde=Morphism(D['P'],D['B'])
+        ftilde.namescheme=("{}tilde",("f"))
+        ftilde.latexscheme=("\\tilde\{{}\}",("f"))
+        Commute(D["f"],D["pi"]*ftilde)
+
+class InjectiveUP(RuleGenerator):
+    def CharacteristicDiagram(self,CD):
+        '''I <-f- A
+            .-    |
+            |\    |
+              \   |
+               !  iota
+                \ |
+                 \|/
+                  B'''
+        B = Object(CD,"B")
+        A = Object(CD,"A")
+        I = Object(CD,"I")
+        f = Morphism(A,I,"f")
+        iota= Morphism(A,B,"iota")
+        Monomorphism(iota)
+        Injective(I)
+
+    def conclude(self,D):
+        ftilde=Morphism(D['B'],D['I'])
+        ftilde.namescheme=("{}tilde",("f"))
+        ftilde.latexscheme=("\\tilde\{{}\}",("f"))
+        Commute(D["f"],ftilde*D['iota'])
+            
+class ExplicitCompositionRule(RuleGenerator):
+    def CharacteristicDiagram(self,CD):
+        '''
+        A --f-> B --g-> C
+        \            ""/|
+         \            / |
+          \          /
+           *--g*f---*
+        '''
+        A=Object(CD,'A')
+        B=Object(CD,'B')
+        C=Object(CD,'C')
+        Morphism(A,B,'f')
+        Morphism(B,C,'g')
+
+    def conclude(self,D):
+        gof=Morphism(D['A'],D['C'])
+        gof.latexscheme=("{} \\circ {}",('g','f'))
+        gof.namescheme=("{} o {}",('g','f'))
+        Commute(D["g"]*D['f'],gof)
         
 class ProductRuleUniqueGenerator(RuleGenerator):
     def CharacteristicDiagram(self,CD):

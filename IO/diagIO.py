@@ -210,6 +210,14 @@ def direction(morph):
             return "l"*(-right)+"d"*down
         else:
             return "l"*(-right)+"u"*(-down)
+
+def samecount(morph,mrphs):
+    '''counts morphisms in morphs that would graphically coincide with morph'''
+    count=0
+    for other in mrphs[morph.source.gridpos]:
+        if other.target.gridpos==morph.target.gridpos:
+            count+=1
+    return count
             
 def latexDiag(D):
         (maxi,maxj,grid)=Grid(D)
@@ -218,9 +226,11 @@ def latexDiag(D):
             if hasattr(morph,'hide') and morph.hide==True:
                 continue            #morphism is hidden
             if not(hasattr(morph.source,'gridpos')):
-               continue             #source object is hidden
+                continue             #source object is hidden
             if not(hasattr(morph.target,'gridpos')):
-               continue             #target object is hidden
+                continue             #target object is hidden
+            if direction(morph)=='':
+                continue            #we do not draw identities. TODO: draw a loop if the user really wants it
             i=morph.source.gridpos[0]
             j=morph.source.gridpos[1]
             try:
@@ -233,17 +243,20 @@ def latexDiag(D):
                 if grid.has_key((i,j)):
                     out=out+grid[(i,j)].latex + " "
                     if mrphs.has_key((i,j)):
-                        offset=-(len(mrphs[(i,j)])-1)*0.5
+                        offset=dict()
+                        for m in mrphs[(i,j)]:
+                            try:
+                                offset[m.target.gridpos]+=1
+                            except:
+                                offset[m.target.gridpos]=0
                         for morph in mrphs[(i,j)]:
-                            if direction(morph)=='':
-                                continue               #we do not draw identities on the graph. TODO: draw a loop if the user really wants it
                             out=out+" "+r"\arrow"
                             out+=r"["
                             try:
                                 out=out+morph.style+r","
                             except:
                                 pass
-                            out+=r"shift left="+str(offset)+r"]"
+                            out+=r"shift left="+str(offset[m.target.gridpos])+r"]"
                             try:
                                 out+=r"{"+direction(morph)+r"}"
                             except BaseException as E:
@@ -256,7 +269,6 @@ def latexDiag(D):
                                 out+=r"{"+morph.latex+"}"
                             except:
                                 pass
-                            offset=offset+1           #to dodge other arrows
                 out=out+r" &"
             out=out+"\\\\ \n"
         return out

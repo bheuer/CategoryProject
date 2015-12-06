@@ -1,7 +1,7 @@
 from Diagram import Diagram,Object,Morphism
 from Solver.RuleMaster import RuleMaster
 from Solver.Prioritiser import UltimateWeightPriotiser
-from Property.Property import ProductProperty
+from Property.Property import *
 from IO.diagIO import diagBuild, latexDiag, Display, DisplayAll, DisplayMorphism, DisplayAllMorphisms
 from Rule import *
 from Homomorphism.HomomorphismIterator import HomomorphismIterator
@@ -25,6 +25,8 @@ def test():
         ers.append(ExtensionRequest(rule,hom))
     for ER in ers:
         ER.implement()
+    
+    
     return D
 
 #    AxA = Object(D,"AxA")
