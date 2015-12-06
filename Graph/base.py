@@ -26,6 +26,11 @@ class IamTiredOfNetworkxNotHavingAnEdgeObjectGraph(MultiDiGraph):
         self.keycounter+=1
         return e
     
+    def overwrite_edge(self,morph,edge2):
+        edge = self.InverseLookUp[morph]
+        MultiDiGraph.remove_edge(self,edge.source,edge.target,key = edge.key)
+        self.InverseLookUp[morph] = edge2
+    
     def out_edges(self,node):
         for _,_,data in MultiDiGraph.out_edges(self,node,data=True):
             yield data["object"]

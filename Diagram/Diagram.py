@@ -76,9 +76,7 @@ class Diagram(object):
             for partial_m2 in self.CommutativityQuotient.get_edge_image(partial_m):
                 if partial_m2.name == partial_m.name:
                     continue
-                print end,partial_m2,start
                 newmorph = end.compose(partial_m2.compose(start,dry = True),dry = True)
-                print newmorph
                 if newmorph in self.MorphismList:
                     self.unify(morph,newmorph)
             
@@ -100,6 +98,9 @@ class Diagram(object):
             return
         
         #morph1 and morph2 belong to the same Commutativity Class
+        
+        edge1 = self.EquivalenceGraph.InverseLookUp[EC1]
+        self.EquivalenceGraph.overwrite_edge(EC2,edge1)
         
         EC1.merge_with(EC2)
         
@@ -123,6 +124,9 @@ class Diagram(object):
             #morphisms not known => were not added by the user or by a rule => internal investigation going on
             return False
         return self.CommutativityQuotient.get_edge_image(morphism1)==self.CommutativityQuotient.get_edge_image(morphism2)
+    
+    def doesDryMorphismExist(self,drymorphism):
+        return (drymorphism.name in self.MorphismNames)
     
     def getPropertyTags(self,morph):
         return self.Graph.InverseLookUp[morph]["propertyTags"]
