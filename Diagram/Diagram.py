@@ -148,15 +148,26 @@ class Diagram(object):
             i+=1
         return mode+str(i)
     
-    def print_(self):
-        for s in self.Objects:
-            for t in self.Morphisms[s]:
-                for f in self.Morphisms[s][t]:
-                    print f
+    def printCommutativity(self):
+        printed = []
+        for s in self.MorphismList:
+            quot = s.equivalenceClass()
+            if iscontainedin(quot, printed):
+                continue
+            printed.append(quot)
+            print quot
                     
 def isolatedNodes(diagram):
     for o in diagram.Objects:
         if is_isolate(diagram.Graph,o):
             yield o
+            
+
+def iscontainedin(item,list_):
+    #for unhashable items that have an equality
+    for i in list_:
+        if i==item:
+            return True
+    return False
 
     
