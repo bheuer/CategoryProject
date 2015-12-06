@@ -4,9 +4,10 @@ from Morphisms import Morphism
 from Graph import IamTiredOfNetworkxNotHavingAnEdgeObjectGraph
 from Commute import CommutingMorphismEquivalenceClass
 from Homomorphism.base import Homomorphism
+from Category import Category,GenericCategory
 
 class Diagram(object):
-    def __init__(self):
+    def __init__(self,category = None):
         self.Objects = []
         self.Morphisms = {}
         self.Graph = IamTiredOfNetworkxNotHavingAnEdgeObjectGraph()
@@ -21,6 +22,13 @@ class Diagram(object):
         self.MorphismList = []
         self.MorphismNames = set()
         self.Properties = []
+        
+        if category is None:
+            category = GenericCategory
+        self.category =category
+        
+        for O in self.category.SpecialObjects:
+            O(self) # initialize object
     
     def __getitem__(self,item):
         for i in self.Objects:
@@ -137,7 +145,6 @@ class Diagram(object):
         self.EquivalenceGraph.InverseLookUp[quot]["propertyTags"].append(propTag)
         
     def addName(self,name):
-        
         if name in self.UNIVERSE:
             raise ValueError,"name {} already given".format(name)
         self.UNIVERSE.add(name)
@@ -156,7 +163,7 @@ class Diagram(object):
                 continue
             printed.append(quot)
             print quot
-                    
+     
 def isolatedNodes(diagram):
     for o in diagram.Objects:
         if is_isolate(diagram.Graph,o):
