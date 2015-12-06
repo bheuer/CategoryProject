@@ -8,7 +8,7 @@ import unittest
 from Property.TestPrioritiser import CustomRuleWeight_MaxObjectPlusMaxMorphismPrioritiser
 from Solver.Prioritiser import UltimateWeightPriotiser
 from Rule import EpimorphismRule, MonomorphismRule, ExistIdentity,\
-    ProductRuleUnique
+    ProductRuleUnique, CoProductRuleUnique, FibreProductRuleUnique, FibreProductRule
 from Rule.Compose import ComposeRule
 
 class CompositionTestCase(unittest.TestCase):
@@ -263,6 +263,87 @@ class ProductTestCase(unittest.TestCase):
         Commute(pi1*f,pi1*g)
         RM.rule_exhaustively()
         assert f==g
+
+class CoProductTestCase(unittest.TestCase):
+    def runTest(self):
+        D = Diagram()
+          
+        '''
+            V
+          f :| g
+            :| 
+            P         coproduct
+       pi1 / \ pi2
+          /   \
+         A     B
+           
+        '''
+          
+        A = Object(D,"A")
+        B = Object(D,"B")
+        P = Object(D,"P")
+        V = Object(D,"V")
+          
+        pi1 = Morphism(A,P,"pi1")
+        pi2 = Morphism(B,P,"pi2")
+        f = Morphism(P,V,"f")
+        g = Morphism(P,V,"g")
+      
+        CoProductProperty(pi1,pi2)
+        
+        RM = RuleMaster(D,Rules = [CoProductRuleUnique])
+        
+        Commute(f*pi2,g*pi2)
+        RM.rule_exhaustively()
+        assert f!=g
+        
+        Commute(f*pi1,g*pi1)
+        RM.rule_exhaustively()
+        assert f==g
+
+class TwoFibreProductsTestCase(unittest.TestCase):
+    def runTest(self):
+	CD=Diagram()
+	'''
+      T
+  m,m2 \\  f   g
+	A -- B -- C
+      h |   i|   j|
+	|    |    |
+	D -- E -- F
+	  k    l
+	'''
+	A=Object(CD)
+	B=Object(CD)
+	C=Object(CD)
+	D=Object(CD)
+	E=Object(CD)
+	F=Object(CD)
+	T=Object(CD)
+	
+	f=Morphism(A,B)
+	g=Morphism(B,C)
+	h=Morphism(A,D)
+	i=Morphism(B,E)
+	j=Morphism(C,F)
+	k=Morphism(D,E)
+	l=Morphism(E,F)
+	
+	Commute(k*h,i*f)
+	Commute(l*i,j*g)
+	FibreProductProperty(h,f,k,i,k*h,i*f)
+	FibreProductProperty(i,g,l,j,l*i,j*g)
+	
+	m=Morphism(T,A)
+	m2=Morphism(T,A)
+	Commute(h*m,h*m2)
+	Commute(f*m,f*m2)
+	
+	RM = RuleMaster(CD,Rules = [FibreProductRuleUnique])
+        
+        RM.rule_exhaustively()
+        #assert l*k*h==j*g*f
+      
 
 class RuleMasterTest(unittest.TestCase):
     def runTest(self):

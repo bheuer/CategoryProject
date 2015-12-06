@@ -1,4 +1,4 @@
-from Rule.rule import ProductRuleUnique
+from Rule.rule import ProductRuleUnique, CoProductRuleUnique
 
 class Category:
     def __init__(self,name,setOfRules,setOfDistinguishedObjects,inheritFrom = None):
@@ -6,4 +6,4 @@ class Category:
         self.setOfRules = setOfRules.add(inheritFrom.setOfRules)
         self.setOfDistinguishedObjects = setOfDistinguishedObjects.add(inheritFrom.setOfDistinguishedObjects)
     
-Basic = Category("hasProducts",setOfRules= [ProductRuleUnique()()])
+Basic = Category("hasProducts",setOfRules= [ProductRuleUnique()(),CoProductRuleUnique()()])

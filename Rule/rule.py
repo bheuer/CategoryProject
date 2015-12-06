@@ -1,4 +1,4 @@
-from Property import ProductProperty, Monomorphism, Epimorphism, Projective, Injective, CoProductProperty
+from Property import ProductProperty, Monomorphism, Epimorphism, Projective, Injective, CoProductProperty, FibreProductProperty
 from Diagram import Morphism,Object,Commute,Distinct,Identity
 from base import RuleGenerator
 
@@ -54,7 +54,7 @@ class ProductRuleGenerator(RuleGenerator):
         Commute(D["f"],D["pi1"]*phi)
         Commute(D["g"],D["pi2"]*phi)
 
-class CoProductRule(RuleGenerator):
+class CoProductRuleGenerator(RuleGenerator):
     def CharacteristicDiagram(self,CD):
         '''
                 N
@@ -166,6 +166,40 @@ class ProductRuleUniqueGenerator(RuleGenerator):
     def conclude(self,D):
         Commute(D["phi2"],D["phi1"])
 
+class CoProductRuleUniqueGenerator(RuleGenerator):
+    def CharacteristicDiagram(self,CD):
+        '''
+                N
+              /| | \  
+           f | | | | g
+             |  P  |
+             | / \ |
+              A   B
+        '''
+        
+        A = Object(CD,"A")
+        B = Object(CD,"B")    
+        P = Object(CD,"P")
+        pi1 = Morphism(A,P,"pi1")
+        pi2 = Morphism(B,P,"pi2")
+        CoProductProperty(pi1,pi2)
+        
+        N = Object(CD,"N")
+        f = Morphism(A,N,"f")
+        g = Morphism(B,N,"g")
+        phi1 = Morphism(P,N,"phi1")
+        phi2 = Morphism(P,N,"phi2")
+        
+        Commute(phi1*pi1,f)
+        Commute(phi2*pi1,f)
+        Commute(phi1*pi2,g)
+        Commute(phi2*pi2,g)
+        
+        
+        Distinct(phi1,phi2) # makes sure the RuleMaster doesn't get excited about phi1 commuting with itself
+    
+    def conclude(self,D):
+        Commute(D["phi2"],D["phi1"])
 
 class EpimorphismRuleGenerator(RuleGenerator):
     def CharacteristicDiagram(self,CD):
@@ -214,7 +248,85 @@ class MonomorphismRuleGenerator(RuleGenerator):
         f1 = CD["f1"]
         f2 = CD["f2"]
         Commute(f1,f2)
+
+class FibreProductRuleUniqueGenerator(RuleGenerator):
+    def CharacteristicDiagram(self,CD):
+        '''
+                N
+              /| | \  
+           f | | | | g
+             |  P  |
+             | / \ |
+              A   B
+               \ /
+                C
+        '''
         
+        A = Object(CD,"A")
+        B = Object(CD,"B")
+        C = Object(CD, "C")
+        P = Object(CD,"P")
+        pi1 = Morphism(P,A,"pi1")
+        pi2 = Morphism(P,B,"pi2")
+        f = Morphism(A,C,"f")
+        g = Morphism(B,C, "g")
+        Commute(f*pi1,g*pi2)
+        FibreProductProperty(pi1,pi2,f,g,f*pi1,g*pi2)
+        
+        N = Object(CD,"N")
+        f = Morphism(N,A,"f")
+        g = Morphism(N,B,"g")
+        phi1 = Morphism(N,P,"phi1")
+        phi2 = Morphism(N,P,"phi2")
+        
+        Commute(pi1*phi1,f)
+        Commute(pi1*phi2,f)
+        Commute(pi2*phi1,g)
+        Commute(pi2*phi2,g)
+        
+        
+        Distinct(phi1,phi2) # makes sure the RuleMaster doesn't get excited about phi1 commuting with itself
+
+    
+    def conclude(self,D):
+      Commute(D["phi2"],D["phi1"])
+        
+        
+class FibreProductRuleGenerator(RuleGenerator):
+    def CharacteristicDiagram(self,CD):
+        '''
+                N
+              /| | \  
+           f | | | | g
+             |  P  |
+             | / \ |
+              A   B
+            h  \ / i
+                C
+        '''
+        
+        A = Object(CD,"A")
+        B = Object(CD,"B")
+        C = Object(CD, "C")
+        P = Object(CD,"P")
+        pi1 = Morphism(P,A,"pi1")
+        pi2 = Morphism(P,B,"pi2")
+        h = Morphism(A,C,"h")
+        i = Morphism(B,C, "i")
+        Commute(h*pi1,i*pi2)
+        FibreProductProperty(pi1,pi2,h,i,h*pi1,i*pi2)
+        
+        N = Object(CD,"N")
+        f = Morphism(N,A,"f")
+        g = Morphism(N,B,"g")
+        Commute(h*f,i*g)
+        
+    
+    def conclude(self,D):
+        phi = Morphism(D["N"],D["P"],"phi")
+        Commute(D["f"],D["pi1"]*phi)
+        Commute(D["g"],D["pi2"]*phi)
+
 #this is just so that Ben's IDE knows what they are
 #IDEs don't read execs
         
