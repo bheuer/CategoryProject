@@ -120,7 +120,7 @@ class InjectiveUP(RuleGenerator):
         B = Object(CD,"B")
         A = Object(CD,"A")
         I = Object(CD,"I")
-        f = Morphism(A,I,"f")
+        Morphism(A,I,"f")
         iota= Morphism(A,B,"iota")
         Monomorphism(iota)
         Injective(I)
@@ -159,7 +159,6 @@ class ProductRuleUniqueGenerator(RuleGenerator):
         Commute(pi1*phi2,f)
         Commute(pi2*phi1,g)
         Commute(pi2*phi2,g)
-        
         
         Distinct(phi1,phi2) # makes sure the RuleMaster doesn't get excited about phi1 commuting with itself
     

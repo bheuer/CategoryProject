@@ -24,6 +24,7 @@ class Monomorphism(MorphismsProperty):
     name = "monomorphism"
     weight = -20
 
+
 class Projective(ObjectProperty):
     name = "ProjectiveObject"
 
@@ -49,11 +50,6 @@ class CoProductProperty(Property):
         AxB = Object(D,"product")
         Morphism(A,AxB,"i1")
         Morphism(B,AxB,"i2")
-
-class ZeroObject(Property):
-    name = "zero"
-    def buildCharDiagram(self,D):
-        Object(D,"0",)
 
 if __name__ == "__main__":
     D = Diagram()
