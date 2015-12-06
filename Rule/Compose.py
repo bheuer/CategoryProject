@@ -2,7 +2,7 @@ from ExtensionRequest import ExtensionRequest
 from Diagram import Object,Morphism,Diagram
 from Homomorphism.base import Homomorphism
 from base import Rule
-from Diagram.Morphisms import Identity
+from Rule.abelian import ZeroObject, ZeroMorphism
 
 CD = Diagram()
 A = Object(CD,"A") 
@@ -36,7 +36,11 @@ class ComposeRequest(ExtensionRequest):
         self.mainDiag = hom.D2
         self.charDiag = hom.D1
         
+        
         self.useful = True
+        if isZeroAndNotUseful(self.GC,self.FC):
+            self.useful = False
+        
         for m_f in self.FC.Morphisms:
             for m_g in self.GC.Morphisms:
                 m = m_f.compose(m_g,dry = True)
@@ -47,7 +51,33 @@ class ComposeRequest(ExtensionRequest):
         self.rule = rule
     
     def implement(self):
-        #print "HIER",self.f,self.g
-        self.FC.representative*self.GC.representative
+        #most important line is the following
+        #here the morphism is build and then added to the diagram
+        morph = self.FC.representative*self.GC.representative
+        
+        if isMorphiZero(self.FC) or isMorphiZero(self.GC):
+            ZeroMorphism(morph)
+            print "hier"
+
 
 ComposeRule = ComposeRuleClass()
+
+#methods to make Abelian Categories faster
+def isZeroAndNotUseful(m1,m2):
+    if not isMorphiZero(m1) and not isMorphiZero(m2):
+        return False
+    
+    #can still be Zeromorphism
+    if isinstance(m2.source,ZeroObject) and isinstance(m1.target,ZeroObject):
+        for m_ in (m1,m2):
+            if all(len(m.Composition)>1 for m in m_.Morphisms):
+                return True
+        return False
+    return True
+
+def isMorphiZero(m):
+    for p in m.diagram.EquivalenceGraph.InverseLookUp[m]["propertyTags"]:
+        if p.prop_name == "zeromorphism":
+            return True
+    return False
+

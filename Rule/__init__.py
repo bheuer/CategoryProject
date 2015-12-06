@@ -1,6 +1,7 @@
-import rule
 import inspect
 from base import Rule,RuleGenerator
+from rule import *
+import rule
 
 for name, cls in inspect.getmembers(rule):
     if inspect.isclass(cls) and issubclass(cls, RuleGenerator):
