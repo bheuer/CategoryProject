@@ -1,6 +1,7 @@
 from Diagram import Diagram, Object, Morphism
 from Diagram.Diagram import isolatedNodes
 from Homomorphism import Homomorphism
+from Diagram.Commute import CommutingMorphismEquivalenceClass
 
 #abstractBaseClass
 class Property:
@@ -80,11 +81,15 @@ class Property:
 
     def registerPropertyTags(self):
         for node,image in self.homomorphism.iterNodes():
-            self.homomorphism.D2.Graph.node[image]["propertyTags"].add(PropertyTag(self,node.name,self.id))
+            propTag = PropertyTag(self,node.name,self.id)
+            self.homomorphism.D2.Graph.node[image]["propertyTags"].append(propTag)
+            self.homomorphism.D2.EquivalenceGraph.node[image]["propertyTags"].append(propTag)
+            
         #edgeTags not working because no edge objects   
         for morph,image in self.homomorphism.iterEdges():
             morphiname = morph.Composition[0].name
-            self.homomorphism.D2.InverseLookUp[image]["propertyTags"].add(PropertyTag(self,morphiname,self.id))
+            propTag = PropertyTag(self,morphiname,self.id)
+            self.homomorphism.D2.appendPropertyTag(image,propTag)
             
     def processPropertyInput(self,args):
         if len(args)==1 and isinstance(args[0],Homomorphism):
@@ -102,6 +107,10 @@ class Property:
             try:
                 for edge in signature_edges:
                     f = args.pop(0)
+                    
+                    if isinstance(f,CommutingMorphismEquivalenceClass):
+                        f = f.representative
+                    
                     assert isinstance(f,Morphism),"too little init Morphisms given"
                     hom.extend_edge(edge,f)
                 

@@ -30,6 +30,8 @@ class Homomorphism:
                 return False
         return True
         
+    def __ne__(self,hom):
+        return not self.__eq__(hom)   
         
     def get_edge_image(self,item):
         if self.edgeMap.has_key(item):
@@ -38,7 +40,7 @@ class Homomorphism:
             iterator = item.iterComposingMorphisms()
             morphi = self.edgeMap[next(iterator)]
             for atomic in iterator: #inefficient #it just got even more inefficient
-                morphi = morphi*self.edgeMap[atomic]
+                morphi = morphi.compose(self.edgeMap[atomic])
             return morphi
     
     def get_node_image(self,item):

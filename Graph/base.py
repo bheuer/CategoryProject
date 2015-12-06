@@ -17,12 +17,19 @@ class IamTiredOfNetworkxNotHavingAnEdgeObjectGraph(MultiDiGraph):
     def __init__(self,*args):
         super(IamTiredOfNetworkxNotHavingAnEdgeObjectGraph,self).__init__(args)
         self.keycounter = 0
+        self.InverseLookUp = {}
     
     def add_edge(self,node1,node2,**kwargs):# inefficient but nobody cares and it's convenient
         e=Edge(node1,node2,self.keycounter,kwargs)
         MultiDiGraph.add_edge(self,node1,node2,object = e,key = self.keycounter)
+        self.InverseLookUp[kwargs["morphism"]] = e
         self.keycounter+=1
         return e
+    
+    def overwrite_edge(self,morph,edge2):
+        edge = self.InverseLookUp[morph]
+        MultiDiGraph.remove_edge(self,edge.source,edge.target,key = edge.key)
+        self.InverseLookUp[morph] = edge2
     
     def out_edges(self,node):
         for _,_,data in MultiDiGraph.out_edges(self,node,data=True):

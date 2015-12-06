@@ -4,9 +4,13 @@ from collections import defaultdict
 
 def ImObjectIndex(o,ER):
     return ER.mainDiag.Objects.index(o)
-def ImMorphismIndex(f,ER):
-    return ER.mainDiag.MorphismList.index(f)
 
+def ImMorphismIndex(f,ER):
+    try:
+        return ER.mainDiag.MorphismList.index(f)
+    except IndexError:
+        return len(ER.mainDiag.MorphismList)+1
+    
 def newObjectIndex(o,ER):
     #o is in the extension of the ER
     if ER.rule.partialInverse.is_defined_on_node(o):
@@ -43,8 +47,11 @@ def maxdef(iterator, default):
         max_ = max(max_,i)
     return max_
 
+def ImCommutativityClassWeight(comc,ER):
+    return min(ImMorphismIndex(f,ER) for f in comc.Morphisms)
+
 def ImMorphismWeight(ER):
-    return maxdef((ImMorphismIndex(ER.hom.get_edge_image(f),ER) for f in ER.charDiag.MorphismList),0)
+    return maxdef((ImCommutativityClassWeight(ER.hom.get_edge_image(f),ER) for f in ER.charDiag.MorphismList),0)
 
 def ImObjectWeight(ER):
     return maxdef((ImObjectIndex(ER.hom.get_node_image(o),ER) for o in ER.charDiag.Objects),0)

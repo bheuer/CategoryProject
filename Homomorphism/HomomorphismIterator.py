@@ -1,14 +1,13 @@
 from Homomorphism.base import Homomorphism
-from networkx.classes.function import all_neighbors
 from networkx.algorithms.components.weakly_connected import weakly_connected_components
-from Diagram.Commute import Commute,commutes,Distinct
+from Diagram.Commute import Commute,Distinct
 
 class HomomorphismIterator:
     def __init__(self,D1,D2):
         self.D1 = D1
         self.D2 = D2
         self.G1 = D1.Graph
-        self.G2 = D2.Graph
+        self.G2 = D2.EquivalenceGraph
     
     def initialize(self):
         self.hom = Homomorphism(self.D1,self.D2)
@@ -18,6 +17,7 @@ class HomomorphismIterator:
         for G in weakly_connected_components(self.G1):
             #find out which node has the least matching images
             #this should be a good node to start with and then extend homomorphism from there
+            
             nodes = []
             for n in G:
                 nodes.append((sum(1 for n2 in self.G2 if self.doNodesMatch(n, n2)),n))
@@ -35,27 +35,43 @@ class HomomorphismIterator:
     def globalPropertyCheck(self):
         for prop in self.D1.Properties:
             if isinstance(prop,Commute):
-                #prop.Morphilist is a list of morphisms that commute in the source
-                #check that they also commute in the image
-                if not commutes([self.hom.get_edge_image(morph) for morph in prop.MorphiList]):
+                ECs =  [self.hom.get_edge_image(morph) for morph in prop.MorphiList]
+                if not all(i==ECs[0] for i in ECs):
                     return False
+                    
+                
+                
             elif isinstance(prop, Distinct):
-                if commutes([self.hom.get_edge_image(morph) for morph in prop.MorphiList]):
-                    return False
+                #check that no two morphisms of the indicated morphis are mapped to the same image
+                ECs =  [self.hom.get_edge_image(morph) for morph in prop.MorphiList]
+                for e in ECs:
+                    if ECs.count(e)>1:
+                        return False
             else:
                 #check whether the locally matched properties glue together to match to
                 #a global property
                 
                 matched = False
-                _,node = next(prop.homomorphism.iterNodes())
-                image = self.hom[node]
                 
-                for propTag in self.G2.node[image]["propertyTags"]:
-                    if propTag.isinstanceof(prop):
-                        if self.hom*prop.homomorphism == propTag.prop.homomorphism:
+                for prop2 in self.D2.Properties:
+                    if prop2.name == prop.name:
+                        if self.hom*prop.homomorphism == self.D2.CommutativityQuotient*prop2.homomorphism:
+                            
+                            #                     hom
+                            #       (Commutat.) ------->  Commutat.
+                            #       (Quotient )           Quotient
+                            #            A                   A
+                            #            |         //        |
+                            #        topolog.             topolog.
+                            #        Diagram              Diagram
+                            #               A             A
+                            #                \           /
+                            #                 char. Diag.          
+                            #                 of Property          
+                            
                             matched = True
                             break
-
+                
                 if not matched:
                     return False
         return True
@@ -63,12 +79,12 @@ class HomomorphismIterator:
     def doNodesMatch(self,node1,node2):
         P1 = self.G1.node[node1]["propertyTags"]
         P2 = self.G2.node[node2]["propertyTags"]
-        return P1.issubset(P2)
+        return all(p in P2 for p in P1)#P1 subset P2
             
     def doEdgesMatch(self,edge1,edge2):
         P1 = edge1["propertyTags"]
         P2 = edge2["propertyTags"]
-        return P1.issubset(P2)
+        return all(p in P2 for p in P1)#P1 subset P2
     
     def matchComponents(self,index = 0):
         if index==len(self.componentRepresentatives):
@@ -87,9 +103,20 @@ class HomomorphismIterator:
             self.hom.nodeMap[node1]=None
     
     def matchNode(self,node):
-        neighbourlist = [n for n in all_neighbors(self.G1,node) if self.hom.nodeMap.get(n) is None]
+        
         out_edges = [e for e in self.G1.out_edges(node) if len(e["morphism"].Composition)==1]
         in_edges = [e for e in self.G1.in_edges(node) if len(e["morphism"].Composition)==1]
+        
+        neighbourlist = []
+        for e in out_edges:
+            n = e.target
+            if n not in neighbourlist and self.hom.nodeMap.get(n) is None:
+                neighbourlist.append(n)
+        for e in in_edges:
+            n = e.source
+            if n not in neighbourlist and self.hom.nodeMap.get(n) is None:
+                neighbourlist.append(n)
+        
         for _ in self.matchNeighbourhood(out_edges,mode = "out"):
             for _ in self.matchNeighbourhood(in_edges,mode = "in"):
                 for _ in self.matchList(neighbourlist):
@@ -113,11 +140,10 @@ class HomomorphismIterator:
         node,neighbour = edge.source,edge.target
         if mode=="in":
             node,neighbour = neighbour,node
-            
+        
         node2 = self.hom.nodeMap[node]
         
         morphi = edge["morphism"]
-        properties = edge["propertyTags"]
         
         
         neighbour2 = self.hom.nodeMap.get(neighbour)
