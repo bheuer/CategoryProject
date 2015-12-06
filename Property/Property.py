@@ -9,13 +9,26 @@ class MorphismsProperty(Property):
     def __repr__(self):
         str_ = "Morphism Property '{}' for morphism {}".format(self.name,self.homomorphism.edgeMap[self.morph])
         return str_
+
+class ObjectProperty(Property):
+    def buildCharDiagram(self,D):
+        X=Object(D,"X")
+    def __repr__(self):
+        str_="Property '{}' for object {}".format(self.name,self.homomorphism[X].name)
         
 class Epimorphism(MorphismsProperty):
     name = "epimorphism"
     weight = -20
     
 class Monomorphism(MorphismsProperty):
-    name = "epimorphism"
+    name = "monomorphism"
+    weight = -20
+
+class Projective(ObjectProperty):
+    name = "ProjectiveObject"
+
+class Injective(ObjectProperty):
+    name = "InjectiveObject"
 
 class ProductProperty(Property):
     name = "product"
@@ -26,6 +39,16 @@ class ProductProperty(Property):
         AxB = Object(D,"product")
         Morphism(AxB,A,"pi1")
         Morphism(AxB,B,"pi2")
+
+class CoProductProperty(Property):
+    name = "coproduct"
+    weight = -15
+    def buildCharDiagram(self,D):
+        A = Object(D,"factor1",)
+        B = Object(D,"factor2")
+        AxB = Object(D,"product")
+        Morphism(A,AxB,"i1")
+        Morphism(B,AxB,"i2")
 
 class ZeroObject(Property):
     name = "zero"

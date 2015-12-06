@@ -109,8 +109,8 @@ class ProjectiveUP(RuleGenerator):
 
 class InjectiveUP(RuleGenerator):
     def CharacteristicDiagram(self,CD):
-        '''I <-f- A_
-            .-    ( )
+        '''I <-f- A
+            .-    |
             |\    |
               \   |
                !  iota
