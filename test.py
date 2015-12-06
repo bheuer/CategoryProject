@@ -10,7 +10,7 @@ from Solver.Prioritiser import UltimateWeightPriotiser
 from Rule import EpimorphismRule, MonomorphismRule, ExistIdentity,\
     ProductRuleUnique, CoProductRuleUnique, FibreProductRuleUnique, FibreProductRule
 from Rule.Compose import ComposeRule
-from Rule.abelian import AbelianCategory
+from Rule.abelian import AbelianCategory, Kernel
 from Rule.abelianRules import abelianRules
 
 class CompositionTestCase(unittest.TestCase):
@@ -371,7 +371,7 @@ class RuleMasterTest(unittest.TestCase):
         assert D["m2*m1"]==D["id_BxA"]
         assert D["m1*m2"]==D["id_AxB"]
         
-class AbelianTest(unittest.TestCase):
+class AbelianZeroObjectTest(unittest.TestCase):
     def runTest(self):
         D = Diagram(category = AbelianCategory)
         A = Object(D,"A")
@@ -380,7 +380,30 @@ class AbelianTest(unittest.TestCase):
         Rules = abelianRules+[ComposeRule,ExistIdentity]
         RM = RuleMaster(D,Rules = Rules, prioritiser = UltimateWeightPriotiser)
         for i in xrange(20):
-            RM.rule(verbose = True)
-        print D.Objects
-        D.printCommutativity()
+            RM.rule()
+        #D.printCommutativity()
         
+class AbelianKernelTest(unittest.TestCase):
+    def runTest(self):
+        D = Diagram(category = AbelianCategory)
+        
+        A = Object(D,"A")
+        B = Object(D,"B")
+        K = Object(D,"K")
+        f = Morphism(A,B,"f")
+        iker = Morphism(K,A,"ker_f")
+        Kernel(f,iker)
+        
+        C = Object(D,"C")
+        g = Morphism(C,A,"g")
+        
+        zero = D["0"]
+        m1 = Morphism(C,zero,"01")
+        m2 = Morphism(zero,B,"02")
+        Commute(f*g,m2*m1)
+        
+        Rules = abelianRules+[ComposeRule,ExistIdentity]
+        RM = RuleMaster(D,Rules = Rules, prioritiser = UltimateWeightPriotiser)
+        for i in xrange(20):
+            RM.rule(verbose = True)
+        D.printCommutativity()

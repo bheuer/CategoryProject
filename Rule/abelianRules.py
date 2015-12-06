@@ -56,6 +56,41 @@ class KernelExistRuleGenerator(RuleGenerator):
         iker = Morphism(K,CD["A"])
         iker.namescheme=('i_ker_{}',('f'))
         Kernel(CD["f"],iker)
+        
+class KernelUniversalRuleGenerator(RuleGenerator):
+    category = AbelianCategory
+    def CharacteristicDiagram(self, CD):
+        '''         f
+        kerf --> A --> B
+                 |   /
+              g  |  / 0 
+                 C /
+                  
+        
+        '''
+        
+        A = Object(CD,"A")
+        B = Object(CD,"B")
+        K = Object(CD,"K")
+        f = Morphism(A,B,"f")
+        iker = Morphism(K,A,"ker_f")
+        Kernel(f,iker)
+        
+        C = Object(CD,"C")
+        g = Morphism(C,A,"g")
+        NonZeroMorphism(g)
+        
+        zero = CD["0"]
+        m1 = Morphism(C,zero,"01")
+        m2 = Morphism(zero,B,"02")
+        Commute(f*g,m2*m1)
+    
+    def conclude(self,CD):
+        m = Morphism(CD["C"],CD["K"])
+        m.namescheme = ('m_{}~',('g'))
+        g = CD["g"]
+        iker = CD["ker_f"]
+        Commute(g,iker*m)
 
 def isMorphismZero(m):
     if isinstance(m.source,ZeroObject) or isinstance(m.target,ZeroObject):
@@ -70,5 +105,6 @@ InitialExistRule = InitialExistRuleGenerator()()
 FinalUniqueRule = FinalUniqueRuleGenerator()()
 InitialUniqueRule = InitialUniqueRuleGenerator()()
 KernelExistRule = KernelExistRuleGenerator()()
+KernelUniversalRule = KernelUniversalRuleGenerator()()
 
-abelianRules = [InitialExistRule,FinalExistRule,InitialUniqueRule,FinalUniqueRule,KernelExistRule]
+abelianRules = [InitialExistRule,FinalExistRule,InitialUniqueRule,FinalUniqueRule,KernelExistRule,KernelUniversalRule]
