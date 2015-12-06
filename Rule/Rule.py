@@ -51,6 +51,7 @@ class ProductRule(RuleGenerator):
     
     def conclude(self,D):
         phi = Morphism(D["N"],D["P"],"phi")
+        phi.namescheme=("{} \\times {}",('f','g'))
         Commute(D["f"],D["pi1"]*phi)
         Commute(D["g"],D["pi2"]*phi)
 
@@ -67,8 +68,8 @@ class CoProductRule(RuleGenerator):
         A = Object(CD,"A")
         B = Object(CD,"B")    
         P = Object(CD,"P")
-        i1 = Morphism(A,P,"pi1")
-        i2 = Morphism(B,P,"pi2")
+        i1 = Morphism(A,P,"i1")
+        i2 = Morphism(B,P,"i2")
         CoProductProperty(i1,i2)
         
         N = Object(CD,"N")
