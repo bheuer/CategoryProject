@@ -35,6 +35,7 @@ class HomomorphismIterator:
     def globalPropertyCheck(self):
         for prop in self.D1.Properties:
             if isinstance(prop,Commute):
+                
                 ECs =  [self.hom.get_edge_image(morph) for morph in prop.MorphiList]
                 if not all(i==ECs[0] for i in ECs):
                     return False
