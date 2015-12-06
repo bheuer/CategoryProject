@@ -8,7 +8,7 @@ commutativity check should be O(1), so we do an expensive update of all commutat
 '''
 
 
-from Morphisms import Morphism, AbstractMorphism
+from Morphisms import Morphism, AbstractMorphism,Identity
 from Homomorphism import Homomorphism
 import itertools
 
@@ -82,9 +82,14 @@ class CommutingMorphismEquivalenceClass(AbstractMorphism):
     def __iter__(self):
         for m in self.Morphisms:
             yield m
-            
-    def __mul__(self,CC):
+    
+    def compose(self,CC):
+        if isinstance(CC.representative,Identity):
+            return self
         return self.diagram.CommutativityQuotient.get_edge_image(self.representative*CC.representative)
+       
+    def __mul__(self,CC):
+        return self.compose(CC)
     
     def __eq__(self,CC):
         if self is CC:#same object in memory: shortcut, this is faster

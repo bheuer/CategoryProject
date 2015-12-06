@@ -4,9 +4,13 @@ from collections import defaultdict
 
 def ImObjectIndex(o,ER):
     return ER.mainDiag.Objects.index(o)
-def ImMorphismIndex(f,ER):
-    return ER.mainDiag.MorphismList.index(f)
 
+def ImMorphismIndex(f,ER):
+    try:
+        return ER.mainDiag.MorphismList.index(f)
+    except IndexError:
+        return len(ER.mainDiag.MorphismList)+1
+    
 def newObjectIndex(o,ER):
     #o is in the extension of the ER
     if ER.rule.partialInverse.is_defined_on_node(o):

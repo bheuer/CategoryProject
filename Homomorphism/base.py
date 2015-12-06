@@ -40,7 +40,7 @@ class Homomorphism:
             iterator = item.iterComposingMorphisms()
             morphi = self.edgeMap[next(iterator)]
             for atomic in iterator: #inefficient #it just got even more inefficient
-                morphi = morphi*self.edgeMap[atomic]
+                morphi = morphi.compose(self.edgeMap[atomic])
             return morphi
     
     def get_node_image(self,item):
