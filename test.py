@@ -303,46 +303,49 @@ class CoProductTestCase(unittest.TestCase):
 
 class TwoFibreProductsTestCase(unittest.TestCase):
     def runTest(self):
-	CD=Diagram()
-	'''
-      T
-  m,m2 \\  f   g
-	A -- B -- C
-      h |   i|   j|
-	|    |    |
-	D -- E -- F
-	  k    l
-	'''
-	A=Object(CD)
-	B=Object(CD)
-	C=Object(CD)
-	D=Object(CD)
-	E=Object(CD)
-	F=Object(CD)
-	T=Object(CD)
-	
-	f=Morphism(A,B)
-	g=Morphism(B,C)
-	h=Morphism(A,D)
-	i=Morphism(B,E)
-	j=Morphism(C,F)
-	k=Morphism(D,E)
-	l=Morphism(E,F)
-	
-	Commute(k*h,i*f)
-	Commute(l*i,j*g)
-	FibreProductProperty(h,f,k,i,k*h,i*f)
-	FibreProductProperty(i,g,l,j,l*i,j*g)
-	
-	m=Morphism(T,A)
-	m2=Morphism(T,A)
-	Commute(h*m,h*m2)
-	Commute(f*m,f*m2)
-	
-	RM = RuleMaster(CD,Rules = [FibreProductRuleUnique])
-        
+        CD=Diagram()
+        '''
+              T
+          m,m2 \\  f   g
+            	A -- B -- C
+              h |   i|   j|
+            	|    |    |
+            	D -- E -- F
+            	  k    l
+    	'''
+    	A=Object(CD,"A")
+    	B=Object(CD,"B")
+    	C=Object(CD,"C")
+    	D=Object(CD,"D")
+    	E=Object(CD,"E")
+    	F=Object(CD,"F")
+    	T=Object(CD,"T")
+    	
+    	f=Morphism(A,B,"f")
+    	g=Morphism(B,C,"g")
+    	h=Morphism(A,D,"h")
+    	i=Morphism(B,E,"i")
+    	j=Morphism(C,F,"j")
+    	k=Morphism(D,E,"k")
+    	l=Morphism(E,F,"l")
+    	
+    	Commute(k*h,i*f)
+    	Commute(l*i,j*g)
+    	FibreProductProperty(h,f,k,i,k*h,i*f)
+    	FibreProductProperty(i,g,l,j,l*i,j*g)
+    	
+    	m=Morphism(T,A)
+    	m2=Morphism(T,A)
+    	Commute(h*m,h*m2)
+    	Commute(f*m,f*m2)
+    	
+    	RM = RuleMaster(CD,Rules = [FibreProductRuleUnique])
+            
+        assert l*k*h==j*g*f
+        assert m!=m2
         RM.rule_exhaustively()
-        #assert l*k*h==j*g*f
+        assert m==m2
+        
       
 
 class RuleMasterTest(unittest.TestCase):

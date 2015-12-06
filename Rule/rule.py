@@ -254,11 +254,11 @@ class FibreProductRuleUniqueGenerator(RuleGenerator):
         '''
                 N
               /| | \  
-           f | | | | g
+           F | | | | G
              |  P  |
              | / \ |
               A   B
-               \ /
+            p  \ / q
                 C
         '''
         
@@ -268,10 +268,10 @@ class FibreProductRuleUniqueGenerator(RuleGenerator):
         P = Object(CD,"P")
         pi1 = Morphism(P,A,"pi1")
         pi2 = Morphism(P,B,"pi2")
-        f = Morphism(A,C,"f")
-        g = Morphism(B,C, "g")
-        Commute(f*pi1,g*pi2)
-        FibreProductProperty(pi1,pi2,f,g,f*pi1,g*pi2)
+        y = Morphism(A,C,"y")
+        z = Morphism(B,C, "z")
+        Commute(y*pi1,z*pi2)
+        FibreProductProperty(pi1,pi2,y,z,y*pi1,z*pi2)
         
         N = Object(CD,"N")
         f = Morphism(N,A,"f")
@@ -289,7 +289,7 @@ class FibreProductRuleUniqueGenerator(RuleGenerator):
 
     
     def conclude(self,D):
-      Commute(D["phi2"],D["phi1"])
+        Commute(D["phi2"],D["phi1"])
         
         
 class FibreProductRuleGenerator(RuleGenerator):
