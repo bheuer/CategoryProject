@@ -89,10 +89,12 @@ class ExtensionRequest:
             try:
                 names=[]
                 for s in obj.namescheme[1]:
-                    try:
+                    obj_item =  self.charDiag[s]
+                    if isinstance(obj_item,Object):
                         names.append(self.hom[self.charDiag[s]].name)
-                    except:                 #no such object, maybe a morphism?
-                        names.append(self.hom.edgeMap[self.charDiag.Morphisms[s]].name)
+                    else:#morphism
+                        names.append(self.hom.get_edge_image(self.charDiag[s]).representative.name)
+                
                 newname=obj.namescheme[0].format(*names)
                 newobj = Object(self.mainDiag,newname)   #try naming according to scheme
             except:
