@@ -125,7 +125,36 @@ class ExtensionRequest:
             if isinstance(morphi,Identity):
                 newmorphi = Identity(source)
             else:
-                newmorphi = Morphism(source,target)
+                try:
+                    names=[]
+                    for s in morphi.namescheme[1]:
+                        try:
+                            names.append(self.hom[self.charDiag[s]].name)
+                        except:                 #no such object, maybe a morphism?
+                            names.append(self.hom.edgeMap[self.charDiag.Morphisms[s]].name)
+                    newname=morphi.namescheme[0].format(*names)
+                    newmorphi = Morphism(morphi.source,morphi.target,newname)   #try naming according to scheme
+                except:
+                    try:
+                        newmorphi=Morphism(source,target,self.mainDiag.giveName(mode=newname)) #append a number to name if this failed
+                    except:
+                        newmorphi = Morphism(source,target)           #give a generic name if everything fails
+                latexlist=[]
+                try:
+                    for s in morphi.latexscheme[1]:
+                        try:
+                            try:
+                                latexlist.append(self.hom[self.charDiag[s]].latex)
+                            except:
+                                latexlist.append(self.hom[self.charDiag[s]].name)
+                        except:
+                            try:
+                                latexlist.append(self.hom.edgeMap[self.charDiag.Morphisms[s]].latex)
+                            except:
+                                latexlist.append(self.hom.edgeMap[self.charDiag.Morphisms[s]].name)
+                    newmorphi.latex=morphi.latexscheme[0].format(*latexlist)  #set LaTeX display string
+                except:
+                    pass
             lift.set_edge_image(morphi,self.mainDiag.CommutativityQuotient.get_edge_image(newmorphi))
        
         #compose characteristic homomorphism of property with lift to get
