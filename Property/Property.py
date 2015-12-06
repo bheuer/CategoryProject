@@ -14,8 +14,9 @@ class ObjectProperty(Property):
     def buildCharDiagram(self,D):
         X=Object(D,"X")
     def __repr__(self):
-        str_="Property '{}' for object {}".format(self.name,self.homomorphism[X].name)
-        
+        str_ = "Property '{}' for object {}".format(self.name,self.homomorphism[self.X].name)
+        return str_ 
+
 class Epimorphism(MorphismsProperty):
     name = "epimorphism"
     weight = -20
@@ -50,19 +51,4 @@ class CoProductProperty(Property):
         AxB = Object(D,"product")
         Morphism(A,AxB,"i1")
         Morphism(B,AxB,"i2")
-
-if __name__ == "__main__":
-    D = Diagram()
-    A = Object(D,"A")
-    B = Object(D,"B")
-    AxB = Object(D,"AxB")
-    f = Morphism(AxB,A,"f")
-    g = Morphism(AxB,B,"g") 
-    
-    p = ProductProperty(f,g)
-    zero = ZeroObject(A)
-    epi = Epimorphism(f)
-    
-    print p
-    print zero
-    print epi
+        

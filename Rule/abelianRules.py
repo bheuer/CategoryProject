@@ -1,7 +1,7 @@
 from Diagram import *
 from base import RuleGenerator
 from abelian import AbelianCategory
-from Rule.abelian import ZeroMorphism
+from Rule.abelian import ZeroMorphism, NonZeroMorphism, Kernel, ZeroObject
 
 
 class InitialExistRuleGenerator(RuleGenerator):
@@ -42,11 +42,33 @@ class FinalUniqueRuleGenerator(RuleGenerator):
     def conclude(self,CD):
         Commute(CD["m1"],CD["m2"])
 
+class KernelExistRuleGenerator(RuleGenerator):
+    category = AbelianCategory
+    def CharacteristicDiagram(self, CD):
+        A = Object(CD,"A")
+        B = Object(CD,"B")
+        f = Morphism(A,B,"f")
+        NonZeroMorphism(f)
+        
+    def conclude(self,CD):
+        K = Object(CD,"ker_f")
+        K.namescheme=('ker_{}',('f'))
+        iker = Morphism(K,CD["A"])
+        iker.namescheme=('i_ker_{}',('f'))
+        Kernel(CD["f"],iker)
 
+def isMorphismZero(m):
+    if isinstance(m.source,ZeroObject) or isinstance(m.target,ZeroObject):
+        return True
+    for p in m.diagram.EquivalenceGraph.InverseLookUp[m]["propertyTags"]:
+        if p.prop_name == "zeromorphism":
+            return True
+    return False        
 
 FinalExistRule = FinalExistRuleGenerator()()
 InitialExistRule = InitialExistRuleGenerator()()
 FinalUniqueRule = FinalUniqueRuleGenerator()()
 InitialUniqueRule = InitialUniqueRuleGenerator()()
+KernelExistRule = KernelExistRuleGenerator()()
 
-abelianRules = [InitialExistRule,FinalExistRule,InitialUniqueRule,FinalUniqueRule]
+abelianRules = [InitialExistRule,FinalExistRule,InitialUniqueRule,FinalUniqueRule,KernelExistRule]

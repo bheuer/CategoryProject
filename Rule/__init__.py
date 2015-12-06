@@ -1,6 +1,8 @@
 import inspect
 from base import Rule,RuleGenerator
 from rule import *
+from abelian import *
+from abelianRules import *
 import rule
 
 for name, cls in inspect.getmembers(rule):

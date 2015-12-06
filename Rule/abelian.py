@@ -1,5 +1,6 @@
 from Diagram import Diagram,Object,Morphism,Category
-from Property.Property import ObjectProperty, MorphismsProperty
+from Property import ObjectProperty, MorphismsProperty,Property
+
 
 class InitialObject(ObjectProperty):
     name = "Initial"
@@ -22,5 +23,22 @@ class ZeroObject(Object):
 class ZeroMorphism(MorphismsProperty):
     name = "zeromorphism"
     weight = 0
+
+class Kernel(Property):
+    name = "kernel"
+    weight = -15
+    def buildCharDiagram(self,D):
+        A = Object(D,"A",)
+        B = Object(D,"B")
+        K = Object(D,"kernel")
+        Morphism(A,B,"f")
+        Morphism(K,A,"ker_f")
+        
+class NonZeroMorphism:#Pseudoproperty like "Distinct"
+    def __init__(self,f):
+        assert isinstance(f,Morphism)
+        self.morph = f
+        diagram = f.diagram
+        diagram.addProperty(self)
 
 AbelianCategory = Category([ZeroObject],[])

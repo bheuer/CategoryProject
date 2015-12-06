@@ -295,7 +295,8 @@ class AbelianTest(unittest.TestCase):
         
         Rules = abelianRules+[ComposeRule,ExistIdentity]
         RM = RuleMaster(D,Rules = Rules, prioritiser = UltimateWeightPriotiser)
-        RM.rule_exhaustively(verbose = True)
+        for i in xrange(20):
+            RM.rule(verbose = True)
         print D.Objects
         D.printCommutativity()
         

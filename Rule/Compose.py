@@ -2,7 +2,8 @@ from ExtensionRequest import ExtensionRequest
 from Diagram import Object,Morphism,Diagram
 from Homomorphism.base import Homomorphism
 from base import Rule
-from Rule.abelian import ZeroObject, ZeroMorphism
+from abelian import ZeroObject, ZeroMorphism
+from abelianRules import isMorphismZero
 
 CD = Diagram()
 A = Object(CD,"A") 
@@ -55,7 +56,7 @@ class ComposeRequest(ExtensionRequest):
         #here the morphism is build and then added to the diagram
         morph = self.FC.representative*self.GC.representative
         
-        if isMorphiZero(self.FC) or isMorphiZero(self.GC):
+        if isMorphismZero(self.FC) or isMorphismZero(self.GC):
             ZeroMorphism(morph)
             print "hier"
 
@@ -64,7 +65,7 @@ ComposeRule = ComposeRuleClass()
 
 #methods to make Abelian Categories faster
 def isZeroAndNotUseful(m1,m2):
-    if not isMorphiZero(m1) and not isMorphiZero(m2):
+    if not isMorphismZero(m1) and not isMorphismZero(m2):
         return False
     
     #can still be Zeromorphism
@@ -74,10 +75,4 @@ def isZeroAndNotUseful(m1,m2):
                 return True
         return False
     return True
-
-def isMorphiZero(m):
-    for p in m.diagram.EquivalenceGraph.InverseLookUp[m]["propertyTags"]:
-        if p.prop_name == "zeromorphism":
-            return True
-    return False
 
