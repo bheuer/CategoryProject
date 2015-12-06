@@ -14,8 +14,8 @@ def test():
     ProductProperty(f,g)
     
     RM = RuleMaster(D,prioritiser = UltimateWeightPriotiser)
-    for _ in xrange(8):
-        RM.rule(numberOfExtensions=10,verbose=True)
+    for _ in xrange(20):
+        RM.rule(numberOfExtensions=3,verbose=True)
     D.printCommutativity()
     print D.Objects
 

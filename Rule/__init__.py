@@ -14,5 +14,4 @@ for name, cls in inspect.getmembers(rule):
         
         exec(clsname+"= cls()()")
         
-        #print "generated Rule",clsname
         #print eval(clsname)

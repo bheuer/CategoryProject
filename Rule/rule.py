@@ -1,8 +1,6 @@
 from Property import ProductProperty, Monomorphism, Epimorphism, Projective, Injective, CoProductProperty
 from Diagram import Morphism,Object,Commute,Distinct,Identity
 from base import RuleGenerator
-from Homomorphism.base import Homomorphism
-from Property.Property import Monomorphism
 
 class ExistIdentityGenerator(RuleGenerator):
     RuleName = "ExistIdentity"
@@ -69,8 +67,8 @@ class CoProductRule(RuleGenerator):
         A = Object(CD,"A")
         B = Object(CD,"B")    
         P = Object(CD,"P")
-        i1 = Morphism(A,P,"pi1")
-        i2 = Morphism(B,P,"pi2")
+        i1 = Morphism(A,P,"i1")
+        i2 = Morphism(B,P,"i2")
         CoProductProperty(i1,i2)
         
         N = Object(CD,"N")
@@ -132,27 +130,6 @@ class InjectiveUP(RuleGenerator):
         ftilde.namescheme=("{}tilde",("f"))
         ftilde.latexscheme=("\\tilde\{{}\}",("f"))
         Commute(D["f"],ftilde*D['iota'])
-            
-class ExplicitCompositionRule(RuleGenerator):
-    def CharacteristicDiagram(self,CD):
-        '''
-        A --f-> B --g-> C
-        \            ""/|
-         \            / |
-          \          /
-           *--g*f---*
-        '''
-        A=Object(CD,'A')
-        B=Object(CD,'B')
-        C=Object(CD,'C')
-        Morphism(A,B,'f')
-        Morphism(B,C,'g')
-
-    def conclude(self,D):
-        gof=Morphism(D['A'],D['C'])
-        gof.latexscheme=("{} \\circ {}",('g','f'))
-        gof.namescheme=("{} o {}",('g','f'))
-        Commute(D["g"]*D['f'],gof)
         
 class ProductRuleUniqueGenerator(RuleGenerator):
     def CharacteristicDiagram(self,CD):
@@ -203,7 +180,7 @@ class EpimorphismRuleGenerator(RuleGenerator):
         B = Object(CD,"B")
         C = Object(CD,"C")
         f = Morphism(A,B,"f")
-        Monomorphism(f)
+        Epimorphism(f)
         g1 = Morphism(B,C,"g1")
         g2 = Morphism(B,C,"g2")
         Distinct(g1,g2)
