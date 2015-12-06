@@ -7,6 +7,7 @@ from Solver import RuleMaster
 import unittest
 from Property.TestPrioritiser import CustomRuleWeight_MaxObjectPlusMaxMorphismPrioritiser
 from Solver.Prioritiser import UltimateWeightPriotiser
+from Rule.Rule import EpimorphismRule
 
 class CompositionTestCase(unittest.TestCase):
     def runTest(self):
@@ -126,62 +127,64 @@ class SecondCommutativityTestCase(unittest.TestCase):
         
         assert g3*f2*f1==h2*h1*g1
 
+class MonomEpiTestCase(unittest.TestCase):
+    def runTest(self):
+        D = Diagram()
+         
+        '''
+         
+         f0      f1      f2
+    A0 -->> A1 ---> A2 ---> A3
+            |        |        |
+            | g1     | g2     | g3
+            V        V        |
+            B1 ---> B2 ---> B3 (--->B4
+                h1      h2      h3
+         
+        '''
+         
+        A0 = Object(D,"A0")
+        A1 = Object(D,"A1")
+        A2 = Object(D,"A2")
+        A3 = Object(D,"A3")
+        B1 = Object(D,"B1")
+        B2 = Object(D,"B2")
+        B3 = Object(D,"B3")
+        B4 = Object(D,"B4")
+         
+        f0 = Morphism(A0,A1,"f0")
+        f1 = Morphism(A1,A2,"f1")
+        f2 = Morphism(A2,A3,"f2")
+        g1 = Morphism(A1,B1,"g1")
+        g2 = Morphism(A2,B2,"g2")
+        g3 = Morphism(A3,B3,"g3")
+        h1 = Morphism(B1,B2,"h1")
+        h2 = Morphism(B2,B3,"h2")
+        h3 = Morphism(B3,B4,"h3")
+         
+        Commute(g2*f1*f0,h1*g1*f0)
+         
+         
+        assert g2*f1*f0==h1*g1*f0
+        assert g2*f1!=h1*g1
+        Epimorphism(f0)
+        RM = RuleMaster(D,prioritiser = UltimateWeightPriotiser,Rules=[EpimorphismRule()()])
+        RM.rule_exhaustively(verbose = True)
+        assert g2*f1==h1*g1
+        assert g3*f2!=h2*g2
+        Commute(h3*g3*f2,h3*h2*g2)
+        assert g3*f2!=h2*g2
+        
+        #Monomorphism(h3)
+        #RM.rule_exhaustively(verbose = True)
+        #assert g3*f2==h2*g2
+        #assert g3*f2*f1==h2*h1*g1
+     
 #===============================================================================
-# class MonomEpiTestCase(unittest.TestCase):
-#     def runTest(self):
-#         D = Diagram()
-#         
-#         '''
-#         
-#          f0      f1      f2
-#     A0 -->> A1 ---> A2 ---> A3
-#             |        |        |
-#             | g1     | g2     | g3
-#             V        V        |
-#             B1 ---> B2 ---> B3 (--->B4
-#                 h1      h2      h3
-#         
-#         '''
-#         
-#         A0 = Object(D,"A0")
-#         A1 = Object(D,"A1")
-#         A2 = Object(D,"A2")
-#         A3 = Object(D,"A3")
-#         B1 = Object(D,"B1")
-#         B2 = Object(D,"B2")
-#         B3 = Object(D,"B3")
-#         B4 = Object(D,"B4")
-#         
-#         f0 = Morphism(A0,A1,"f0")
-#         f1 = Morphism(A1,A2,"f1")
-#         f2 = Morphism(A2,A3,"f2")
-#         g1 = Morphism(A1,B1,"g1")
-#         g2 = Morphism(A2,B2,"g2")
-#         g3 = Morphism(A3,B3,"g3")
-#         h1 = Morphism(B1,B2,"h1")
-#         h2 = Morphism(B2,B3,"h2")
-#         h3 = Morphism(B3,B4,"h3")
-#         
-#         Commute(g2*f1*f0,h1*g1*f0)
-#         
-#         
-#         assert g2*f1*f0==h1*g1*f0
-#         assert g2*f1!=h1*g1
-#         Epimorphism(f0)
-#         assert g2*f1==h1*g1
-#         
-#         Monomorphism(h3)
-#         assert g3*f2!=h2*g2
-#         Commute(h3*g3*f2,h3*h2*g2)
-#         assert g3*f2==h2*g2
-#         assert g3*f2*f1==h2*h1*g1
-#===============================================================================
-#===============================================================================
-#     
 # class CyclesTestCase(unittest.TestCase):
 #     def runTest(self):
 #         D = Diagram()
-#         
+#          
 #         '''
 #             f1
 #         A1 <---  A2
@@ -190,30 +193,28 @@ class SecondCommutativityTestCase(unittest.TestCase):
 #         V        |
 #         B1 ---> B2
 #             h1
-#         
+#          
 #         '''
 #         A1 = Object(D,"A1")
 #         A2 = Object(D,"A2")
 #         B1 = Object(D,"B1")
 #         B2 = Object(D,"B2")
-#         
-#         
+#          
+#          
 #         f1 = Morphism(A2,A1,"f1")
 #         g1 = Morphism(A1,B1,"g1")
 #         h1 = Morphism(B1,B2,"h1")
 #         g2 = Morphism(B2,A2,"g2")
-#         
+#          
 #         loop =  f1*g2*h1*g1
 #         assert loop!=A1.Identity
 #         Commute(loop,A1.Identity)
 #         assert loop==A1.Identity
-#===============================================================================
-#===============================================================================
-# 
+#  
 # class ProductTestCase(unittest.TestCase):
 #     def runTest(self):
 #         D = Diagram()
-#         
+#          
 #         '''
 #             V
 #           f :| g
@@ -222,22 +223,22 @@ class SecondCommutativityTestCase(unittest.TestCase):
 #        pi1 / \ pi2
 #           /   \
 #          A     B
-#          
+#           
 #         '''
-#         
+#          
 #         A = Object(D,"A")
 #         B = Object(D,"B")
 #         P = Object(D,"P")
 #         V = Object(D,"V")
-#         
+#          
 #         pi1 = Morphism(P,A,"pi1")
 #         pi2 = Morphism(P,B,"pi2")
 #         f = Morphism(V,P,"f")
 #         g = Morphism(V,P,"g")
-#     
+#      
 #         ProductProperty(pi1,pi2)
 #         Commute(pi2*f,pi2*g)
-#         
+#          
 #         assert f!=g
 #         Commute(pi1*f,pi1*g)
 #         assert f==g
@@ -259,11 +260,12 @@ class RuleMasterTest(unittest.TestCase):
         ProductProperty(pi1_,pi2_)
         
         RM = RuleMaster(D,prioritiser = UltimateWeightPriotiser)
-        RM.rule_exhaustive(numberOfExtensions=2)
+        RM.rule_exhaustively(numberOfExtensions=2)
         
         assert D["m2*m1"]==D["id_BxA"]
         assert D["m1*m2"]==D["id_AxB"]
-        
+
+
 if False:#__name__ == "__main__":
     def test1():
         '''

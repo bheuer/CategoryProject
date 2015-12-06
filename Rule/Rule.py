@@ -91,3 +91,28 @@ class ProductRuleUnique(RuleGenerator):
     
     def conclude(self,D):
         Commute(D["phi2"],D["phi1"])
+
+
+class EpimorphismRule(RuleGenerator):
+    def CharacteristicDiagram(self,CD):
+        ''' 
+                g1
+           f   ---->
+        A --> B     C
+               ---->
+                g2
+        '''
+        A = Object(CD,"A")
+        B = Object(CD,"B")
+        C = Object(CD,"C")
+        f = Morphism(A,B,"f")
+        g1 = Morphism(B,C,"g1")
+        g2 = Morphism(B,C,"g2")
+        Distinct(g1,g2)
+        Commute(g1*f,g2*f)
+    
+    def conclude(self,CD):
+        g1 = CD["g1"]
+        g2 = CD["g2"]
+        Commute(g1,g2)
+        

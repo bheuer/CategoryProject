@@ -14,7 +14,7 @@ def test():
     D = Diagram()
     X = Object(D,"X")
     Y = Object(D,"Y")
-    f1 = Morphism(X,Y)
+    f1 = Morphism(X,Y,"f1")
     f1.name="f1"
     f1.latex=r"\phi"
 
@@ -22,7 +22,7 @@ def test():
     homs=HomomorphismIterator(rule.CD,D)
     ers=[]
     for hom in homs:
-                ers.append(ExtensionRequest(rule,hom))
+        ers.append(ExtensionRequest(rule,hom))
     for ER in ers:
         ER.implement()
     return D
