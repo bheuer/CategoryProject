@@ -2,6 +2,9 @@ from base import Property
 from Diagram import Diagram,Object,Morphism,Commute
 
 class MorphismsProperty(Property):
+    def __init__(self,*args):
+        Property.__init__(self,*args)
+        self.definingMorphism = self.homomorphism.get_edge_image(self.morph)
     def buildCharDiagram(self,D):
         A = Object(D,"O1")
         B = Object(D,"O2")
