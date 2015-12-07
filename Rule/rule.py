@@ -270,7 +270,7 @@ class FibreProductRuleUniqueGenerator(RuleGenerator):
         y = Morphism(A,C,"y")
         z = Morphism(B,C, "z")
         Commute(y*pi1,z*pi2)
-        FibreProductProperty(pi1,pi2,y,z,y*pi1,z*pi2)
+        FibreProductProperty(pi1,pi2,y,z)
         
         N = Object(CD,"N")
         f = Morphism(N,A,"f")
@@ -313,7 +313,7 @@ class FibreProductRuleGenerator(RuleGenerator):
         h = Morphism(A,C,"h")
         i = Morphism(B,C, "i")
         Commute(h*pi1,i*pi2)
-        FibreProductProperty(pi1,pi2,h,i,h*pi1,i*pi2)
+        FibreProductProperty(pi1,pi2,h,i)
         
         N = Object(CD,"N")
         f = Morphism(N,A,"f")
