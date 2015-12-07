@@ -109,6 +109,9 @@ class Homomorphism:
         str_ = ""
         str_+= "| Nodes:\n"
         for obj in self.D1.Objects:
+            image = self.nodeMap.get(obj)
+            if image.name == obj.name == "0":
+                continue
             str_+="|  {} -> {}\n".format(obj, self.nodeMap.get(obj))
         str_+="| Edges:\n"
         for edge in self.D1.MorphismList:
