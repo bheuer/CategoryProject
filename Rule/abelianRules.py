@@ -133,6 +133,8 @@ class KernelUniqueRuleGenerator(RuleGenerator):
 def isMorphismZero(m):
     if isinstance(m.source,ZeroObject) or isinstance(m.target,ZeroObject):
         return True
+    if isinstance(m,Morphism):
+        m = m.equivalenceClass()
     for p in m.diagram.EquivalenceGraph.InverseLookUp[m]["propertyTags"]:
         if p.prop_name == "zeromorphism":
             return True
