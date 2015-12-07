@@ -55,6 +55,7 @@ class KernelExistRuleGenerator(RuleGenerator):
         iker = Morphism(K,CD["A"])
         iker.namescheme=('i_ker_{}',('f'))
         Kernel(CD["f"],iker)
+        ZeroMorphism(CD["f"]*iker)
         
 class KernelUniversalRuleGenerator(RuleGenerator):
     category = AbelianCategory
