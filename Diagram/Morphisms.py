@@ -106,6 +106,7 @@ def processInputMorphisms(*args,**kwargs):
         name = None
     
     if name is not None and "*" in name:
+        raise ValueError,(args,kwargs)
         raise ValueError,"name must not contain the symbol '*'. Seriously, I want to be nice to you and I just can't if you use it."
     
     if len(args)>=2 and isinstance(args[0],Object) and isinstance(args[1],Object):
@@ -163,7 +164,6 @@ class Morphism(AbstractMorphism):
         
         if not dry: 
             assert name not in self.diagram.UNIVERSE
-            
         
         #create list of constituting user-defined Morphisms
         self.Composition = []
@@ -217,7 +217,7 @@ class Morphism(AbstractMorphism):
         #iter all constituting partitions of self into three morphisms end*partial*star
         l = len(self.Composition)
         
-        for i0 in xrange(l-1):
+        for i0 in xrange(l):
             if i0==0:
                 end = Identity(self.target,dry=True)
             else:
@@ -248,7 +248,10 @@ class Morphism(AbstractMorphism):
 
 class Identity(Morphism):
     def __init__(self,o,dry = False):
-        self.name = "id_"+o.name # should be tested for safety
+        if "*" in o.name:
+            self.name = "id_"+o.diagram.giveName()
+        else:
+            self.name = "id_"+o.name # should be tested for safety
         self.obj = o
         Morphism.__init__(self,o,o,self.name,dry=dry)
         self.diagram = o.diagram

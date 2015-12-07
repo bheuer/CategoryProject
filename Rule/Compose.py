@@ -58,7 +58,6 @@ class ComposeRequest(ExtensionRequest):
         
         if isMorphismZero(self.FC) or isMorphismZero(self.GC):
             ZeroMorphism(morph)
-            print "hier"
 
 
 ComposeRule = ComposeRuleClass()

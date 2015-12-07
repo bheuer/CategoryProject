@@ -11,7 +11,7 @@ from Rule import EpimorphismRule, MonomorphismRule, ExistIdentity,\
     ProductRuleUnique, CoProductRuleUnique, FibreProductRuleUnique, FibreProductRule
 from Rule.Compose import ComposeRule
 from Rule.abelian import AbelianCategory, Kernel
-from Rule.abelianRules import abelianRules
+from Rule.abelianRules import abelianRules, isMorphismZero
 
 class CompositionTestCase(unittest.TestCase):
     def runTest(self):
@@ -379,7 +379,7 @@ class AbelianZeroObjectTest(unittest.TestCase):
         
         Rules = abelianRules+[ComposeRule,ExistIdentity]
         RM = RuleMaster(D,Rules = Rules, prioritiser = UltimateWeightPriotiser)
-        for i in xrange(20):
+        for i in xrange(40):
             RM.rule()
         #D.printCommutativity()
         
@@ -389,10 +389,7 @@ class AbelianKernelTest(unittest.TestCase):
         
         A = Object(D,"A")
         B = Object(D,"B")
-        K = Object(D,"K")
         f = Morphism(A,B,"f")
-        iker = Morphism(K,A,"ker_f")
-        Kernel(f,iker)
         
         C = Object(D,"C")
         g = Morphism(C,A,"g")
@@ -404,6 +401,12 @@ class AbelianKernelTest(unittest.TestCase):
         
         Rules = abelianRules+[ComposeRule,ExistIdentity]
         RM = RuleMaster(D,Rules = Rules, prioritiser = UltimateWeightPriotiser)
-        for i in xrange(20):
-            RM.rule(verbose = True)
-        D.printCommutativity()
+        for _ in xrange(10):
+            RM.rule(numberOfExtensions=5,verbose = False)
+        
+        #the kernel has ben created
+        assert D["ker_f"] is not None
+        ker_f = D["ker_f"]
+        
+        #and there is a non-trivial morphism C->ker_f
+        assert any(not isMorphismZero(m) for m in D.Morphisms[C][ker_f])
