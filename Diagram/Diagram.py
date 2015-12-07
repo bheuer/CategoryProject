@@ -25,7 +25,7 @@ class Diagram(object):
         
         if category is None:
             category = GenericCategory
-        self.category =category
+        self.category = category
         
         for O in self.category.SpecialObjects:
             O(self) # initialize object
@@ -59,6 +59,10 @@ class Diagram(object):
         if morph.name in self.MorphismNames:
             #nothing to do, Morphism is already added
             return
+        
+        if "0" in [o.source.name for o in morph.Composition] and len(morph.Composition)>2:
+            print morph.Composition,[o.source.name for o in morph.Composition]
+            assert False
         
         self.addName(morph.name)
         
@@ -165,7 +169,21 @@ class Diagram(object):
                 continue
             printed.append(quot)
             print quot
-     
+    
+    def __repr__(self):
+        str_ = "Diagram with the following data"
+        str_+= "| Objects:\n| "
+        str_+="\n| ".join(str(o) for o in self.Objects)
+        str_+="\n\n| Morphisms by Commutativity class:\n| "
+        printed = []
+        for s in self.MorphismList:
+            quot = s.equivalenceClass()
+            if iscontainedin(quot, printed):
+                continue
+            str_+="\n| "+str(quot)
+            printed.append(quot)
+        return str_
+    
 def isolatedNodes(diagram):
     for o in diagram.Objects:
         if is_isolate(diagram.Graph,o):

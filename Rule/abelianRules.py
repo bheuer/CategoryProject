@@ -1,8 +1,9 @@
 from Diagram import *
 from base import RuleGenerator
-from abelian import AbelianCategory
-from Rule.abelian import ZeroMorphism, NonZeroMorphism, Kernel, ZeroObject,\
+from abelianProperty import AbelianCategory
+from Rule.abelianProperty import ZeroMorphism, NonZeroMorphism, Kernel, ZeroObject,\
     SetEqualZero
+from Rule.abelianProperty import GiveZeroMorphism, NonZeroObject
 
 class InitialExistRuleGenerator(RuleGenerator):
     category = AbelianCategory
@@ -18,6 +19,17 @@ class FinalExistRuleGenerator(RuleGenerator):
         Object(CD,"A")
     def conclude(self,CD):
         f = Morphism(CD["A"],CD["0"],"A0")
+        ZeroMorphism(f)
+
+class ZeroMorphismExistRuleGenerator(RuleGenerator):
+    category = AbelianCategory
+    def CharacteristicDiagram(self, CD):
+        A = Object(CD,"A")
+        B = Object(CD,"B")
+        NonZeroObject(A)
+        NonZeroObject(B)
+    def conclude(self,CD):
+        f = Morphism(CD["A"],CD["B"])
         ZeroMorphism(f)
 
 class InitialUniqueRuleGenerator(RuleGenerator):
@@ -123,34 +135,6 @@ class KernelUniqueRuleGenerator(RuleGenerator):
     def conclude(self,CD):
         Commute(CD["phi1"],CD["phi2"])
 
-def isMorphismZero(m):
-    A = m.source
-    B = m.target
-    if isinstance(A,ZeroObject) or isinstance(B,ZeroObject):
-        return True
-    
-    D = m.diagram
-    zero = D["0"]
-    
-    if isinstance(m,Morphism):
-        m = m.equivalenceClass()
-    
-    if not D.Morphisms[A][zero]:
-        return False
-    f0 = D.Morphisms[A][zero][0]
-    
-    if not D.Morphisms[zero][B]:
-        return False
-    g0 = D.Morphisms[zero][B][0]
-    
-    if (g0*f0)==m.representative:
-        return True
-    
-    for p in m.diagram.EquivalenceGraph.InverseLookUp[m]["propertyTags"]:
-        if p.prop_name == "zeromorphism":
-            return True
-    return False
-
 FinalExistRule = FinalExistRuleGenerator()()
 InitialExistRule = InitialExistRuleGenerator()()
 FinalUniqueRule = FinalUniqueRuleGenerator()()
@@ -158,5 +142,3 @@ InitialUniqueRule = InitialUniqueRuleGenerator()()
 KernelExistRule = KernelExistRuleGenerator()()
 KernelUniversalRule = KernelUniversalRuleGenerator()()
 KernelUniqueRule = KernelUniqueRuleGenerator()()
-abelianRules = [InitialExistRule,FinalExistRule,InitialUniqueRule,FinalUniqueRule,\
-                KernelExistRule,KernelUniversalRule,KernelUniqueRule]

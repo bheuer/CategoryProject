@@ -1,8 +1,9 @@
 from Homomorphism.base import Homomorphism
 from networkx.algorithms.components.weakly_connected import weakly_connected_components
 from Diagram.Commute import Commute,Distinct
-from Rule.abelianRules import isMorphismZero
 from Rule import NonZeroMorphism
+from Rule.abelianProperty import NonZeroObject,isMorphismZero, GiveZeroMorphism,\
+    AbelianCategory
 
 class HomomorphismIterator:
     def __init__(self,D1,D2):
@@ -11,9 +12,16 @@ class HomomorphismIterator:
         self.G1 = D1.Graph
         self.G2 = D2.EquivalenceGraph
     
+    def initializeHomomorphism(self):
+        if self.D2.category == AbelianCategory:
+            self.hom = AbelianHomomorphism(self.D1,self.D2)
+        else:
+            self.hom = Homomorphism(self.D1,self.D2)
+            
+    
     def initialize(self):
-        self.hom = Homomorphism(self.D1,self.D2)
-        
+       
+        self.initializeHomomorphism()
         #for each connected component give one arbitrary representative
         self.componentRepresentatives = []
         for G in weakly_connected_components(self.G1):
@@ -37,7 +45,6 @@ class HomomorphismIterator:
     def globalPropertyCheck(self):
         for prop in self.D1.Properties:
             if isinstance(prop,Commute):
-                
                 ECs =  [self.hom.get_edge_image(morph) for morph in prop.MorphiList]
                 if not all(i==ECs[0] for i in ECs):
                     return False
@@ -52,6 +59,11 @@ class HomomorphismIterator:
                 #check that morphism is not known to be zero
                 EC =  self.hom.get_edge_image(prop.morph)
                 if isMorphismZero(EC):
+                    return False
+            elif isinstance(prop, NonZeroObject):
+                #check that morphism is not known to be zero
+                o =  self.hom[prop.obj]
+                if o.name =="0":
                     return False
             else:
                 #check whether the locally matched properties glue together to match to
@@ -197,4 +209,23 @@ class HomomorphismIterator:
     
             self.hom.edgeMap[morphi] = None
             self.hom.nodeMap[neighbour] = None
-    
+
+
+class AbelianHomomorphism(Homomorphism):
+    def get_edge_image(self,item):
+        if self.edgeMap.has_key(item):
+            return self.edgeMap[item]
+        elif len(item.Composition)>1:
+            iterator = item.iterComposingMorphisms()
+            morphi = self.edgeMap[next(iterator)]
+            
+            if isMorphismZero(morphi):
+                return  GiveZeroMorphism(self.nodeMap[item.source],self.nodeMap[item.target]).equivalenceClass()
+            
+            for atomic in iterator: #inefficient #it just got even more inefficient
+                atomicimage = self.edgeMap[atomic]
+                if isMorphismZero(atomicimage):
+                    return GiveZeroMorphism(self.nodeMap[item.source],self.nodeMap[item.target]).equivalenceClass()
+                
+                morphi = morphi.compose(atomicimage)
+            return morphi

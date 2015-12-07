@@ -8,10 +8,9 @@ import unittest
 from Property.TestPrioritiser import CustomRuleWeight_MaxObjectPlusMaxMorphismPrioritiser
 from Solver.Prioritiser import UltimateWeightPriotiser
 from Rule import EpimorphismRule, MonomorphismRule, ExistIdentity,\
-    ProductRuleUnique, CoProductRuleUnique, FibreProductRuleUnique, FibreProductRule
+    ProductRuleUnique, CoProductRuleUnique, FibreProductRuleUnique, FibreProductRule, AbelianRules
 from Rule.Compose import ComposeRule
-from Rule.abelian import AbelianCategory, Kernel, GiveZeroMorphism
-from Rule.abelianRules import abelianRules, isMorphismZero
+from Rule.abelianProperty import AbelianCategory, Kernel, GiveZeroMorphism,isMorphismZero
 
 class CompositionTestCase(unittest.TestCase):
     def runTest(self):
@@ -377,11 +376,11 @@ class AbelianZeroObjectTest(unittest.TestCase):
         A = Object(D,"A")
         B = Object(D,"B")
         
-        Rules = abelianRules+[ComposeRule,ExistIdentity]
+        Rules = AbelianRules+[ComposeRule,ExistIdentity]
         RM = RuleMaster(D,Rules = Rules, prioritiser = UltimateWeightPriotiser)
-        for _ in xrange(40):
+        for _ in xrange(20):
             RM.rule()
-        #D.printCommutativity()
+        D.printCommutativity()
         
 class AbelianKernelTest(unittest.TestCase):
     def runTest(self):
@@ -397,7 +396,7 @@ class AbelianKernelTest(unittest.TestCase):
         zerom = GiveZeroMorphism(C,B)
         Commute(f*g,zerom)
         
-        Rules = abelianRules+[ComposeRule,ExistIdentity]
+        Rules = AbelianRules+[ComposeRule,ExistIdentity]
         RM = RuleMaster(D,Rules = Rules, prioritiser = UltimateWeightPriotiser)
         for _ in xrange(10):
             RM.rule(numberOfExtensions=5,verbose = False)
@@ -414,6 +413,5 @@ class AbelianKernelTest(unittest.TestCase):
         
         assert f*iker==GiveZeroMorphism(ker_f, B)
         
-        
-        
+        D.printCommutativity()
         

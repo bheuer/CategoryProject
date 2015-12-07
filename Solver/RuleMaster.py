@@ -4,7 +4,8 @@ from Rule import ProductRule,ExistProduct,ProductRuleUnique,ExistIdentity
 from Rule.Compose import ComposeRule, ComposeRequest
 from Solver.Prioritiser import UltimateWeightPriotiser
 from Diagram.Diagram import iscontainedin
-from Rule.abelianRules import KernelUniversalRule, isMorphismZero
+from Rule.abelianProperty import isMorphismZero, AbelianCategory
+from Rule.abelianRules import KernelUniversalRule
 
 class RuleMaster:
     

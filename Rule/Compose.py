@@ -2,8 +2,8 @@ from ExtensionRequest import ExtensionRequest
 from Diagram import Object,Morphism,Diagram
 from Homomorphism.base import Homomorphism
 from base import Rule
-from abelian import ZeroObject, ZeroMorphism
-from abelianRules import isMorphismZero
+from abelianProperty import ZeroObject, ZeroMorphism
+from Rule.abelianProperty import NonZeroMorphism,isMorphismZero
 
 CD = Diagram()
 A = Object(CD,"A") 
@@ -11,6 +11,8 @@ B = Object(CD,"B")
 C = Object(CD,"C") 
 F = Morphism(B,C,"F")
 G = Morphism(A,B,"G")
+
+
 #A -> B -> C
 extension = Homomorphism(CD,CD)
 extension.set_node_image(A, A)
@@ -39,7 +41,8 @@ class ComposeRequest(ExtensionRequest):
         
         
         self.useful = True
-        if isZeroAndNotUseful(self.GC,self.FC):
+        
+        if isMorphismZero(self.FC) or isMorphismZero(self.GC):
             self.useful = False
         
         for m_f in self.FC.Morphisms:
@@ -52,26 +55,10 @@ class ComposeRequest(ExtensionRequest):
         self.rule = rule
     
     def implement(self):
-        #most important line is the following
         #here the morphism is build and then added to the diagram
-        morph = self.FC.representative*self.GC.representative
-        
         if isMorphismZero(self.FC) or isMorphismZero(self.GC):
-            ZeroMorphism(morph)
+            return
+        morph = self.FC.representative*self.GC.representative
 
 
 ComposeRule = ComposeRuleClass()
-
-#methods to make Abelian Categories faster
-def isZeroAndNotUseful(m1,m2):
-    if not isMorphismZero(m1) and not isMorphismZero(m2):
-        return False
-    
-    #can still be Zeromorphism
-    if isinstance(m2.source,ZeroObject) and isinstance(m1.target,ZeroObject):
-        for m_ in (m1,m2):
-            if all(len(m.Composition)>1 for m in m_.Morphisms):
-                return True
-        return False
-    return True
-
