@@ -4,6 +4,7 @@ from Rule import ProductRule,ExistProduct,ProductRuleUnique,ExistIdentity
 from Rule.Compose import ComposeRule, ComposeRequest
 from Solver.Prioritiser import UltimateWeightPriotiser
 from Diagram.Diagram import iscontainedin
+from Rule.abelianRules import KernelUniversalRule, isMorphismZero
 
 class RuleMaster:
     
@@ -69,7 +70,7 @@ class RuleMaster:
             
             extensionRequest.implement()
             self.implemented.append(extensionRequest)
-            ruleNumber+=1
+            ruleNumber+=1                  
         
         if verbose:
             print "applied {} new rules".format(ruleNumber)

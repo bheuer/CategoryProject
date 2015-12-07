@@ -18,7 +18,7 @@ class RuleGenerator:
         if name is None:
             name = self.__class__.__name__
             if name.endswith("Generator"):
-                name[:-9]
+                name = name[:-9]
         self.RuleName = name
         
     def CharacteristicDiagram(self,CD):

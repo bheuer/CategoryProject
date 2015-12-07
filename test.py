@@ -379,7 +379,7 @@ class AbelianZeroObjectTest(unittest.TestCase):
         
         Rules = abelianRules+[ComposeRule,ExistIdentity]
         RM = RuleMaster(D,Rules = Rules, prioritiser = UltimateWeightPriotiser)
-        for i in xrange(20):
+        for i in xrange(40):
             RM.rule()
         #D.printCommutativity()
         
@@ -389,10 +389,11 @@ class AbelianKernelTest(unittest.TestCase):
         
         A = Object(D,"A")
         B = Object(D,"B")
-        K = Object(D,"K")
         f = Morphism(A,B,"f")
-        iker = Morphism(K,A,"ker_f")
-        Kernel(f,iker)
+        
+        #K = Object(D,"K")
+        #iker = Morphism(K,A,"ker_f")
+        #Kernel(f,iker)
         
         C = Object(D,"C")
         g = Morphism(C,A,"g")
@@ -404,6 +405,6 @@ class AbelianKernelTest(unittest.TestCase):
         
         Rules = abelianRules+[ComposeRule,ExistIdentity]
         RM = RuleMaster(D,Rules = Rules, prioritiser = UltimateWeightPriotiser)
-        for i in xrange(20):
-            RM.rule(verbose = True)
-        D.printCommutativity()
+        for _ in xrange(40):
+            RM.rule(verbose = False)
+        #D.printCommutativity()

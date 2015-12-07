@@ -7,12 +7,13 @@ class MorphismsProperty(Property):
         B = Object(D,"O2")
         self.morph = Morphism(A,B,"f")
     def __repr__(self):
-        str_ = "Morphism Property '{}' for morphism {}".format(self.name,self.homomorphism.edgeMap[self.morph])
+        print self.homomorphism
+        str_ = "Morphism Property '{}' for morphism {}".format(self.name,self.homomorphism.get_edge_image(self.morph))
         return str_
 
 class ObjectProperty(Property):
     def buildCharDiagram(self,D):
-        X=Object(D,"X")
+        self.X=Object(D,"X")
     def __repr__(self):
         str_ = "Property '{}' for object {}".format(self.name,self.homomorphism[self.X].name)
         return str_ 
