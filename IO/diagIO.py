@@ -1,5 +1,25 @@
 from Diagram import *
+from Diagram.Morphisms import AtomicMorphism
 import re
+
+def processDiagSequence(ds):
+    out=r"""\documentclass[a4paper]{article}
+           \usepackage[english]{babel}
+           \usepackage[utf8x]{inputenc}
+           \usepackage{amsmath}
+           \usepackage{graphicx}
+           \usepackage{tikz-cd}
+           \begin{document}"""
+    prev=""
+    for tex in ds:
+        if tex==prev:
+            continue
+        out+=r"$$\begin{tikzcd}"+"\n"
+        out+=tex
+        out+=r"\end{tikzcd}$$"+"\n"
+        prev=tex
+    out+=r"\end{document}"
+    return out
 
 def breakMatrix(inp):
     '''breaks up the input LaTeX matrix into an n*k array of strings'''
@@ -225,6 +245,8 @@ def latexDiag(D):
         for morph in D.MorphismList:
             if hasattr(morph,'hide') and morph.hide==True:
                 continue            #morphism is hidden
+            if len([x for x in morph.iterComposingMorphisms()])>1: #exclude composite morphisms
+                continue
             if not(hasattr(morph.source,'gridpos')):
                 continue             #source object is hidden
             if not(hasattr(morph.target,'gridpos')):
@@ -245,18 +267,26 @@ def latexDiag(D):
                     if mrphs.has_key((i,j)):
                         offset=dict()
                         for m in mrphs[(i,j)]:
-                            try:
-                                offset[m.target.gridpos]+=1
-                            except:
+                            if offset.has_key(m.target.gridpos):
+                                offset[m.target.gridpos]+=-0.5
+                            else:
                                 offset[m.target.gridpos]=0
                         for morph in mrphs[(i,j)]:
+                            morph.addstyle=''
+                            if morph.target.gridpos[0]-morph.source.gridpos[0]==0:
+                                if abs(morph.target.gridpos[1]-morph.source.gridpos[1]>1):
+                                    morph.addstyle+=",bend left"
+                            if morph.target.gridpos[1]-morph.source.gridpos[1]==0:
+                                if abs(morph.target.gridpos[0]-morph.source.gridpos[0]>1):
+                                    morph.addstyle+=",bend left"
                             out=out+" "+r"\arrow"
                             out+=r"["
                             try:
                                 out=out+morph.style+r","
                             except:
                                 pass
-                            out+=r"shift left="+str(offset[m.target.gridpos])+r"]"
+                            out+=r"shift left="+str(offset[m.target.gridpos])+morph.addstyle+r"]"
+                            offset[morph.target.gridpos]+=1
                             try:
                                 out+=r"{"+direction(morph)+r"}"
                             except BaseException as E:

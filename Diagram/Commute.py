@@ -45,6 +45,7 @@ class Commute:
             morph = self.MorphiList[i]
             assert morph // morph0
             diagram.unify(morph0,morph)
+        self.name='commute'             #I hope this is an appropriate name
     
     def push_forward(self,hom):
         assert isinstance(hom, Homomorphism)

@@ -127,7 +127,23 @@ class ExtensionRequest:
             if isinstance(morphi,Identity):
                 newmorphi = Identity(source)
             else:
-                newmorphi = Morphism(source,target)
+                newmorphi = Morphism(source,target)           #do not implement nameschemes for morphisms for now
+                latexlist=[]
+                try:
+                    for s in morphi.latexscheme[1]:
+                        try:
+                            try:
+                                latexlist.append(self.hom[self.charDiag[s]].latex)
+                            except:
+                                latexlist.append(self.hom[self.charDiag[s]].name)
+                        except:
+                            try:
+                                latexlist.append(self.hom.edgeMap[self.charDiag[s]].representative.latex)
+                            except:
+                                latexlist.append(self.hom.edgeMap[self.charDiag[s]].representative.name)
+                    newmorphi.latex=morphi.latexscheme[0].format(*latexlist)  #set LaTeX display string
+                except:
+                    pass
             lift.set_edge_image(morphi,self.mainDiag.CommutativityQuotient.get_edge_image(newmorphi))
        
         #compose characteristic homomorphism of property with lift to get
