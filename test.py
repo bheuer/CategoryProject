@@ -333,8 +333,8 @@ class TwoFibreProductsTestCase(unittest.TestCase):
     	
     	Commute(k*h,i*f)
     	Commute(l*i,j*g)
-    	FibreProductProperty(h,f,k,i,k*h,i*f)
-    	FibreProductProperty(i,g,l,j,l*i,j*g)
+    	FibreProductProperty(h,f,k,i)
+    	FibreProductProperty(i,g,l,j)
     	
     	m=Morphism(T,A)
     	m2=Morphism(T,A)

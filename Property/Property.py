@@ -10,7 +10,6 @@ class MorphismsProperty(Property):
         B = Object(D,"O2")
         self.morph = Morphism(A,B,"f")
     def __repr__(self):
-        print self.homomorphism
         str_ = "Morphism Property '{}' for morphism {}".format(self.name,self.homomorphism.get_edge_image(self.morph))
         return str_
 
@@ -69,6 +68,6 @@ class FibreProductProperty(Property):
         pi2 = Morphism(AxB,B,"pi_2")
         f = Morphism(A,C,"f")
         g = Morphism(B,C,"g")
-        Commute(f*pi1,g*pi2)
+        #Commute(f*pi1,g*pi2) #not necessary
 
 
