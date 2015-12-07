@@ -163,7 +163,6 @@ class Morphism(AbstractMorphism):
         
         if not dry: 
             assert name not in self.diagram.UNIVERSE
-            
         
         #create list of constituting user-defined Morphisms
         self.Composition = []
@@ -217,7 +216,7 @@ class Morphism(AbstractMorphism):
         #iter all constituting partitions of self into three morphisms end*partial*star
         l = len(self.Composition)
         
-        for i0 in xrange(l-1):
+        for i0 in xrange(l):
             if i0==0:
                 end = Identity(self.target,dry=True)
             else:

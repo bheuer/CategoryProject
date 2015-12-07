@@ -78,7 +78,9 @@ class Diagram(object):
         #see what Commutativity Class morph could be in
         
         for end,partial_m,start in morph.iterPartialMorphisms():
-            if partial_m not in self.MorphismList:
+            if partial_m.name not in self.MorphismNames:
+                continue
+            if partial_m.name == morph.name:#infinite recursion and doesn't make sense
                 continue
             
             for partial_m2 in self.CommutativityQuotient.get_edge_image(partial_m):
@@ -87,7 +89,7 @@ class Diagram(object):
                 newmorph = end.compose(partial_m2.compose(start,dry = True),dry = True)
                 if newmorph in self.MorphismList:
                     self.unify(morph,newmorph)
-            
+
     def addProperty(self,prop):
         self.Properties.append(prop)
     

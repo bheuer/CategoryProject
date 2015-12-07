@@ -11,6 +11,7 @@ commutativity check should be O(1), so we do an expensive update of all commutat
 from Morphisms import Morphism, AbstractMorphism,Identity
 from Homomorphism import Homomorphism
 import itertools
+from itertools import product
 
 
 def pairwise(iterable):#from http://stackoverflow.com/questions/5434891/iterate-a-list-as-pair-current-next-in-python
@@ -28,7 +29,15 @@ class Commute:
         if not pairwise(a//b for a,b in pairwise(args)):
             raise ValueError,"commuting morphisms must be aligned, ie have same source and target"
         
-        self.MorphiList = [(m.representative if isinstance(m,CommutingMorphismEquivalenceClass) else m) for m in args]
+        self.MorphiList = []
+        for m in args:
+            if isinstance(m,CommutingMorphismEquivalenceClass):
+                #self.MorphiList.append(m.representative)
+                self.MorphiList+=list(m.Morphisms)
+            else:
+                self.MorphiList.append(m)
+            
+        #self.MorphiList = [(m.representative if isinstance(m,CommutingMorphismEquivalenceClass) else m) for m in args]
         diagram = args[0].diagram
         diagram.addProperty(self)
         morph0 = self.MorphiList[0]
