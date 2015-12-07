@@ -1,6 +1,7 @@
 from Diagram import Diagram,Object,Morphism,Category
 from Property import ObjectProperty, MorphismsProperty,Property
 from Diagram.Commute import Commute
+from Diagram.Diagram import iscontainedin,GiveZeroMorphism
 
 class InitialObject(ObjectProperty):
     name = "Initial"
@@ -35,30 +36,6 @@ class ZeroMorphism(MorphismsProperty):
         zero = GiveZeroMorphism(A,B)
         Commute(zero,image)
 
-def GiveZeroMorphism(A,B):
-    '''
-    cerfully creates the zero morphism
-    defines the corresponding maps A->0 and 0->B
-    and A->0->B only if not defined before, otherwise
-    takes those (any) that the diagram knows already
-    '''
-    
-    assert A.diagram == B.diagram
-    D = A.diagram
-    zero = D["0"]
-    
-    if D.Morphisms[A][zero]:
-        f0 = D.Morphisms[A][zero][0]
-    else:
-        f0 = Morphism(A,zero)
-        
-    if D.Morphisms[zero][B]:
-        g0 = D.Morphisms[zero][B][0]
-    else:
-        g0 = Morphism(zero,B)
-    
-    return g0*f0
-
 def SetEqualZero(f):
     zero = GiveZeroMorphism(f.source, f.target)
     Commute(f,zero)
@@ -71,7 +48,7 @@ class Kernel(Property):
         B = Object(D,"B")
         K = Object(D,"kernel")
         Morphism(A,B,"f")
-        Morphism(K,A,"ker_f")
+        Morphism(K,A,"iker_f")
         
 class CoKernel(Property):
     name = "cokernel"
@@ -83,7 +60,7 @@ class CoKernel(Property):
         Morphism(A,B,"f")
         Morphism(B,coker_f,"pcoker_f")
 
-class Exact(Property):
+class Exactness(Property):
     name = "exact"
     weight = -40
     def buildCharDiagram(self,D):
@@ -108,6 +85,17 @@ class NonZeroObject:
         self.obj = o
         diagram = o.diagram
         diagram.addProperty(self)
+
+     
+class NonIsoMorphism:#Pseudoproperty like "Distinct"
+    name = "nonisomorphism"
+    def __init__(self,f):
+        assert isinstance(f,Morphism)
+        self.morph = f
+        diagram = f.diagram
+        diagram.addProperty(self)
+        
+
 
 def isMorphismZero(m):
     A = m.source
@@ -136,5 +124,63 @@ def isMorphismZero(m):
         if p.prop_name == "zeromorphism":
             return True
     return False
+
+def isIsomorphism(m):
+    if isinstance(m,Morphism):
+        m = m.equivalenceClass()
+    for p in m.diagram.EquivalenceGraph.InverseLookUp[m]["propertyTags"]:
+        if p.prop_name == "isomorphism":
+            return True
+    return False
+
+def Exact(f,g):
+    SetEqualZero(g*f)
+    return Exactness(f,g)
+
+def reprWithoutZeros(D):
+    str_ = "Diagram with the following data"
+    str_+= "| Objects:\n| "
+    str_+="\n| ".join(str(o) for o in D.Objects)
+    str_+="\n\n| Morphisms by Commutativity class:\n| "
+    printed = []
+    for s in D.MorphismList:
+        quot = s.equivalenceClass()
+        if isMorphismZero(quot):
+            continue
+        if iscontainedin(quot, printed):
+            continue
+        
+        str_+="\n| "+str(quot)
+        printed.append(quot)
+    return str_
+
+def getCokernel(morph):
+    D = morph.diagram
+    eq = morph.equivalenceClass()
+    for proptag in D.EquivalenceGraph.InverseLookUp[eq]["propertyTags"]:
+        if proptag.prop_name == "cokernel":
+            if proptag.function=="f":
+                hom = proptag.prop.homomorphism
+                CD = hom.D1
+                pcoker_f = CD["pcoker_f"]
+                return proptag.prop.homomorphism.get_edge_image(pcoker_f)
+
+def getKernel(morph):
+    D = morph.diagram
+    eq = morph.equivalenceClass()
+    for proptag in D.EquivalenceGraph.InverseLookUp[eq]["propertyTags"]:
+        if proptag.prop_name == "kernel":
+            if proptag.function=="f":
+                hom = proptag.prop.homomorphism
+                CD = hom.D1
+                iker_f = CD["iker_f"]
+                return proptag.prop.homomorphism.get_edge_image(iker_f)
+
+def iterNonZeroMorphisms(A,B):
+    assert A.diagram==B.diagram
+    D = A.diagram
+    for m in D.Morphisms[A][B]:
+        if not isMorphismZero(m):
+            yield m
 
 AbelianCategory = Category([ZeroObject],[],"abelian")

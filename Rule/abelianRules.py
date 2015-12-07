@@ -1,9 +1,10 @@
 from Diagram import *
 from base import RuleGenerator
-from abelianProperty import AbelianCategory
 from Rule.abelianProperty import ZeroMorphism, NonZeroMorphism, Kernel, ZeroObject,\
-    SetEqualZero, CoKernel
-from Rule.abelianProperty import GiveZeroMorphism, NonZeroObject
+    SetEqualZero, CoKernel, NonIsoMorphism, Exactness
+from Rule.abelianProperty import GiveZeroMorphism, NonZeroObject, AbelianCategory
+from Property.Property import Isomorphism, SetIsomorphism
+
 
 class InitialExistRuleGenerator(RuleGenerator):
     category = AbelianCategory
@@ -61,10 +62,11 @@ class KernelExistRuleGenerator(RuleGenerator):
         B = Object(CD,"B")
         f = Morphism(A,B,"f")
         NonZeroMorphism(f)
+        NonIsoMorphism(f)
         
     def conclude(self,CD):
         K = Object(CD,"ker_f")
-        K.namescheme=('ker_{}',('f'))
+        K.namescheme=('ker_({})',('f'))
         iker = Morphism(K,CD["A"])
         iker.namescheme=('i_ker_{}',('f'))
         Kernel(CD["f"],iker)
@@ -148,10 +150,11 @@ class CoKernelExistRuleGenerator(RuleGenerator):
         B = Object(CD,"B")
         f = Morphism(A,B,"f")
         NonZeroMorphism(f)
+        NonIsoMorphism(f)
         
     def conclude(self,CD):
         coker_f = Object(CD,"coker_f")
-        coker_f.namescheme=('coker_{}',('f'))
+        coker_f.namescheme=('coker_({})',('f'))
         pcoker_f = Morphism(CD["B"],coker_f)
         pcoker_f.namescheme=('i_ker_{}',('f'))
         CoKernel(CD["f"],pcoker_f)
@@ -227,6 +230,49 @@ class CoKernelUniqueRuleGenerator(RuleGenerator):
     
     def conclude(self,CD):
         Commute(CD["phi1"],CD["phi2"])
+
+class ExactnessExistsIsomorphismRuleGenerator(RuleGenerator):
+    category = AbelianCategory
+    def CharacteristicDiagram(self, CD):
+        
+        '''        
+                   psi 
+        ker_coker_f--> ker g
+                 \    /
+               f  \  /  g  
+            A ---> B ---> C
+                   |
+                   |
+                 coker f
+        
+        '''
+        A = Object(CD,"A")
+        B = Object(CD,"B")
+        C = Object(CD,"C")
+        
+        f = Morphism(A,B,"f")
+        g = Morphism(B,C,"g")
+        Exactness(f,g)
+        
+        
+        ker_g = Object(CD,"ker_g")
+        iker_g = Morphism(ker_g,B,"ikerg")
+        Kernel(g,iker_g)
+        
+        coker_f = Object(CD,"coker_f")
+        pcoker_f = Morphism(B,coker_f,"pcoker_f")
+        CoKernel(f,pcoker_f)
+        
+        ker_pcoker_f = Object(CD,"ker_pcoker_f")
+        iker_pcoker_f = Morphism(ker_pcoker_f,B,"iker_pcoker_f")
+        Kernel(pcoker_f,iker_pcoker_f)
+        
+        psi = Morphism(ker_pcoker_f,ker_g,"psi")
+        
+        Commute(iker_g*psi,iker_pcoker_f)
+    
+    def conclude(self,CD):
+        SetIsomorphism(CD["psi"])
 
 FinalExistRule = FinalExistRuleGenerator()()
 InitialExistRule = InitialExistRuleGenerator()()
