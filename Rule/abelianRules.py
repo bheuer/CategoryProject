@@ -1,7 +1,8 @@
 from Diagram import *
 from base import RuleGenerator
 from abelian import AbelianCategory
-from Rule.abelian import ZeroMorphism, NonZeroMorphism, Kernel, ZeroObject
+from Rule.abelian import ZeroMorphism, NonZeroMorphism, Kernel, ZeroObject,\
+    SetEqualZero
 
 class InitialExistRuleGenerator(RuleGenerator):
     category = AbelianCategory
@@ -80,10 +81,7 @@ class KernelUniversalRuleGenerator(RuleGenerator):
         g = Morphism(C,A,"g")
         NonZeroMorphism(g)
         
-        zero = CD["0"]
-        m1 = Morphism(C,zero,"01")
-        m2 = Morphism(zero,B,"02")
-        Commute(f*g,m2*m1)
+        SetEqualZero(f*g)
     
     def conclude(self,CD):
         m = Morphism(CD["C"],CD["K"])
@@ -115,11 +113,6 @@ class KernelUniqueRuleGenerator(RuleGenerator):
         g = Morphism(C,A,"g")
         NonZeroMorphism(g)
         
-        zero = CD["0"]
-        m1 = Morphism(C,zero,"01")
-        m2 = Morphism(zero,B,"02")
-        Commute(f*g,m2*m1)
-        
         phi1 = Morphism(C,K,"phi1")
         phi2 = Morphism(C,K,"phi2")
         Distinct(phi1,phi2)
@@ -131,14 +124,32 @@ class KernelUniqueRuleGenerator(RuleGenerator):
         Commute(CD["phi1"],CD["phi2"])
 
 def isMorphismZero(m):
-    if isinstance(m.source,ZeroObject) or isinstance(m.target,ZeroObject):
+    A = m.source
+    B = m.target
+    if isinstance(A,ZeroObject) or isinstance(B,ZeroObject):
         return True
+    
+    D = m.diagram
+    zero = D["0"]
+    
     if isinstance(m,Morphism):
         m = m.equivalenceClass()
+    
+    if not D.Morphisms[A][zero]:
+        return False
+    f0 = D.Morphisms[A][zero][0]
+    
+    if not D.Morphisms[zero][B]:
+        return False
+    g0 = D.Morphisms[zero][B][0]
+    
+    if (g0*f0)==m.representative:
+        return True
+    
     for p in m.diagram.EquivalenceGraph.InverseLookUp[m]["propertyTags"]:
         if p.prop_name == "zeromorphism":
             return True
-    return False        
+    return False
 
 FinalExistRule = FinalExistRuleGenerator()()
 InitialExistRule = InitialExistRuleGenerator()()

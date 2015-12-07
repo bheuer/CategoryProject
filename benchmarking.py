@@ -20,18 +20,17 @@ def abeliantest():
     C = Object(D,"C")
     g = Morphism(C,A,"g")
     
-    zero = D["0"]
-    m1 = Morphism(C,zero,"01")
-    m2 = Morphism(zero,B,"02")
-    Commute(f*g,m2*m1)
-    
+    SetEqualZero(f*g)
+
     Rules = abelianRules+[ComposeRule,ExistIdentity]
     RM = RuleMaster(D,Rules = Rules, prioritiser = UltimateWeightPriotiser)
-    for _ in xrange(30):
+    for _ in xrange(40):
         RM.rule(verbose=True)
     D.printCommutativity()
-abeliantest()
 
+abeliantest()
+#from cProfile import run
+#run("abeliantest()")
 
 def test():
         

@@ -10,7 +10,7 @@ from Solver.Prioritiser import UltimateWeightPriotiser
 from Rule import EpimorphismRule, MonomorphismRule, ExistIdentity,\
     ProductRuleUnique, CoProductRuleUnique, FibreProductRuleUnique, FibreProductRule
 from Rule.Compose import ComposeRule
-from Rule.abelian import AbelianCategory, Kernel
+from Rule.abelian import AbelianCategory, Kernel, GiveZeroMorphism
 from Rule.abelianRules import abelianRules, isMorphismZero
 
 class CompositionTestCase(unittest.TestCase):
@@ -379,7 +379,7 @@ class AbelianZeroObjectTest(unittest.TestCase):
         
         Rules = abelianRules+[ComposeRule,ExistIdentity]
         RM = RuleMaster(D,Rules = Rules, prioritiser = UltimateWeightPriotiser)
-        for i in xrange(40):
+        for _ in xrange(40):
             RM.rule()
         #D.printCommutativity()
         
@@ -394,10 +394,8 @@ class AbelianKernelTest(unittest.TestCase):
         C = Object(D,"C")
         g = Morphism(C,A,"g")
         
-        zero = D["0"]
-        m1 = Morphism(C,zero,"01")
-        m2 = Morphism(zero,B,"02")
-        Commute(f*g,m2*m1)
+        zerom = GiveZeroMorphism(C,B)
+        Commute(f*g,zerom)
         
         Rules = abelianRules+[ComposeRule,ExistIdentity]
         RM = RuleMaster(D,Rules = Rules, prioritiser = UltimateWeightPriotiser)
@@ -410,3 +408,12 @@ class AbelianKernelTest(unittest.TestCase):
         
         #and there is a non-trivial morphism C->ker_f
         assert any(not isMorphismZero(m) for m in D.Morphisms[C][ker_f])
+        
+        iker = next(m for m in D.Morphisms[ker_f][A] if not isMorphismZero(m))
+        g_ = next(m for m in D.Morphisms[C][ker_f] if not isMorphismZero(m))
+        
+        assert f*iker==GiveZeroMorphism(ker_f, B)
+        
+        
+        
+        

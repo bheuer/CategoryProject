@@ -33,20 +33,37 @@ class ZeroMorphism(MorphismsProperty):
         A = image.source
         B = image.target
         
-        zero = D["0"]
-        if D.Morphisms[A][zero]:
-            f0 = D.Morphisms[A][zero][0]
-        else:
-            f0 = Morphism(A,zero)
-        if D.Morphisms[zero][B]:
-            g0 = D.Morphisms[zero][B][0]
-        else:
-            g0 = Morphism(zero,B)
-        Commute(g0*f0,image)
-            
+        zero = GiveZeroMorphism(A,B)
+        Commute(zero,image)
+
+def GiveZeroMorphism(A,B):
+    '''
+    cerfully creates the zero morphism
+    defines the corresponding maps A->0 and 0->B
+    and A->0->B only if not defined before, otherwise
+    takes those (any) that the diagram knows already
+    '''
+    
+    assert A.diagram == B.diagram
+    D = A.diagram
+    zero = D["0"]
+    
+    if D.Morphisms[A][zero]:
+        f0 = D.Morphisms[A][zero][0]
+    else:
+        f0 = Morphism(A,zero)
         
-        
-        
+    if D.Morphisms[zero][B]:
+        g0 = D.Morphisms[zero][B][0]
+    else:
+        g0 = Morphism(zero,B)
+    
+    return g0*f0
+
+def SetEqualZero(f):
+    zero = GiveZeroMorphism(f.source, f.target)
+    Commute(f,zero)
+
 class Kernel(Property):
     name = "kernel"
     weight = -15
