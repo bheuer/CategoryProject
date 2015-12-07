@@ -106,8 +106,9 @@ def processInputMorphisms(*args,**kwargs):
         name = None
     
     if name is not None and "*" in name:
-        raise ValueError,(args,kwargs)
-        raise ValueError,"name must not contain the symbol '*'. Seriously, I want to be nice to you and I just can't if you use it."
+        if not ("(" in name and ")" in name and name.index("*")>name.index("(") and  name.index("*")<name.index(")")):
+            raise ValueError,(args,kwargs)
+            raise ValueError,"name must not contain the symbol '*'. Seriously, I want to be nice to you and I just can't if you use it."
     
     if len(args)>=2 and isinstance(args[0],Object) and isinstance(args[1],Object):
         o1,o2 = args[0], args[1]
@@ -163,7 +164,7 @@ class Morphism(AbstractMorphism):
         AbstractMorphism.__init__(self,source,target)
         
         if not dry: 
-            assert name not in self.diagram.UNIVERSE
+            assert name not in self.diagram.UNIVERSE,(name,self.diagram.MorphismNames)
         
         #create list of constituting user-defined Morphisms
         self.Composition = []
@@ -236,7 +237,7 @@ class Morphism(AbstractMorphism):
                 yield end,partial,start
     
     def equivalenceClass(self):
-        return self.diagram.CommutativityQuotient.get_edge_image(self)
+        return getImage(self,self.diagram.CommutativityQuotient)
     
     def __repr__(self):
         s = "".join(c.__repr__()+"*" for c in self.Composition)
@@ -249,7 +250,7 @@ class Morphism(AbstractMorphism):
 class Identity(Morphism):
     def __init__(self,o,dry = False):
         if "*" in o.name:
-            self.name = "id_"+o.diagram.giveName()
+            self.name = "id_("+o.name+")"
         else:
             self.name = "id_"+o.name # should be tested for safety
         self.obj = o
@@ -263,4 +264,19 @@ class Identity(Morphism):
         return g
     def __repr__(self):
         return "id_"+self.obj.name
-    
+
+
+def getIdentity(A):
+    id_ = A.diagram["id_"+A.name]
+    if id_ is None:
+        A.diagram["id_("+A.name+")"]
+    if id_ is None:
+        return Identity(A)
+    return id_
+
+def getImage(morph,hom):
+    res = hom.get_edge_image(morph)
+    if res is not None:
+        return res
+    if isinstance(morph,Identity):
+        return getIdentity(hom[morph.source])
