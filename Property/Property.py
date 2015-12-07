@@ -1,5 +1,6 @@
 from base import Property
 from Diagram import Diagram,Object,Morphism,Commute
+from Diagram.Morphisms import Identity, getIdentity
 
 class MorphismsProperty(Property):
     def __init__(self,*args):
@@ -28,7 +29,10 @@ class Monomorphism(MorphismsProperty):
     name = "monomorphism"
     weight = -20
 
-
+class Isomorphism(MorphismsProperty):
+    name = "isomorphism"
+    weight = -20
+        
 class Projective(ObjectProperty):
     name = "ProjectiveObject"
 
@@ -70,4 +74,11 @@ class FibreProductProperty(Property):
         g = Morphism(B,C,"g")
         #Commute(f*pi1,g*pi2) #not necessary
 
-
+def SetIsomorphism(m):
+    minverse = Morphism(m.target,m.source)
+    
+    Commute(minverse*m,getIdentity(m.source))
+    Commute(m*minverse,getIdentity(m.target))
+    Isomorphism(m)
+    Epimorphism(m)
+    Monomorphism(m)

@@ -1,4 +1,4 @@
-from Property import ProductProperty, Monomorphism, Epimorphism, Projective, Injective, CoProductProperty, FibreProductProperty
+from Property import ProductProperty, Monomorphism, Epimorphism, Isomorphism, Projective, Injective, CoProductProperty, FibreProductProperty
 from Diagram import Morphism,Object,Commute,Distinct,Identity
 from base import RuleGenerator
 
@@ -8,7 +8,8 @@ class ExistIdentityGenerator(RuleGenerator):
         Object(CD,"A")
     
     def conclude(self,CD):
-        Identity(CD["A"])
+        i = Identity(CD["A"])
+        Isomorphism(i)
 
 class ExistProductGenerator(RuleGenerator):
     def CharacteristicDiagram(self,CD):
