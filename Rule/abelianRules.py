@@ -2,7 +2,7 @@ from Diagram import *
 from base import RuleGenerator
 from abelianProperty import AbelianCategory
 from Rule.abelianProperty import ZeroMorphism, NonZeroMorphism, Kernel, ZeroObject,\
-    SetEqualZero
+    SetEqualZero, CoKernel
 from Rule.abelianProperty import GiveZeroMorphism, NonZeroObject
 
 class InitialExistRuleGenerator(RuleGenerator):
@@ -131,6 +131,99 @@ class KernelUniqueRuleGenerator(RuleGenerator):
         
         Commute(g,iker*phi2)
         Commute(g,iker*phi1)
+    
+    def conclude(self,CD):
+        Commute(CD["phi1"],CD["phi2"])
+
+class CoKernelExistRuleGenerator(RuleGenerator):
+    category = AbelianCategory
+    def CharacteristicDiagram(self, CD):
+        
+        '''
+            f
+        A ---> B --> coker f
+        '''
+        
+        A = Object(CD,"A")
+        B = Object(CD,"B")
+        f = Morphism(A,B,"f")
+        NonZeroMorphism(f)
+        
+    def conclude(self,CD):
+        coker_f = Object(CD,"coker_f")
+        coker_f.namescheme=('coker_{}',('f'))
+        pcoker_f = Morphism(CD["B"],coker_f)
+        pcoker_f.namescheme=('i_ker_{}',('f'))
+        CoKernel(CD["f"],pcoker_f)
+        ZeroMorphism(pcoker_f*CD["f"])
+        
+class CoKernelUniversalRuleGenerator(RuleGenerator):
+    category = AbelianCategory
+    def CharacteristicDiagram(self, CD):
+        '''
+            f
+        A ---> B --> coker f
+               |   ;
+             g V  ;  g~ 
+               C
+        
+        
+        '''
+        
+        A = Object(CD,"A")
+        B = Object(CD,"B")
+        f = Morphism(A,B,"f")
+        
+        coker_f = Object(CD,"coker_f")
+        pcoker_f = Morphism(B,coker_f,"pcoker_f")
+        
+        CoKernel(f,pcoker_f)
+        
+        C = Object(CD,"C")
+        g = Morphism(B,C,"g")
+        NonZeroMorphism(g)
+        
+        SetEqualZero(g*f)
+    
+    def conclude(self,CD):
+        m = Morphism(CD["coker_f"],CD["C"])
+        m.namescheme = ('m_{}~',('g'))
+        
+        g = CD["g"]
+        pcoker_f = CD["pcoker_f"]
+        Commute(g,m*pcoker_f)
+
+class CoKernelUniqueRuleGenerator(RuleGenerator):
+    category = AbelianCategory
+    def CharacteristicDiagram(self, CD):
+        
+        '''             f
+            kerf --> A --> B
+                \\   |   /
+       phi1,phi2 \\  |  / 0 
+                  \\ C /
+                  
+        
+        '''
+        A = Object(CD,"A")
+        B = Object(CD,"B")
+        f = Morphism(A,B,"f")
+        
+        coker_f = Object(CD,"coker_f")
+        pcoker_f = Morphism(B,coker_f,"pcoker_f")
+        CoKernel(f,pcoker_f)
+        
+        C = Object(CD,"C")
+        g = Morphism(B,C,"g")
+        
+        NonZeroMorphism(g)
+        
+        phi1 = Morphism(coker_f,C,"phi1")
+        phi2 = Morphism(coker_f,C,"phi2")
+        Distinct(phi1,phi2)
+        
+        Commute(g,phi2*pcoker_f)
+        Commute(g,phi1*pcoker_f)
     
     def conclude(self,CD):
         Commute(CD["phi1"],CD["phi2"])

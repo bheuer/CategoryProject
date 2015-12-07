@@ -63,7 +63,9 @@ Weights = defaultdict(int,{ \
                        "ProductRuleUnique":-30,\
                        "ExistIdentity":-100,\
                        "KernelUniversalRule":-100,\
-                       "KernelUniqueRule":-100,
+                       "KernelUniqueRule":-100,\
+                       "CoKernelUniversalRule":-100,\
+                       "CoKernelUniversalRule":-100
                        })
 
 def RuleWeight(ER):

@@ -72,16 +72,16 @@ class Kernel(Property):
         K = Object(D,"kernel")
         Morphism(A,B,"f")
         Morphism(K,A,"ker_f")
-
+        
 class CoKernel(Property):
     name = "cokernel"
     weight = -15
     def buildCharDiagram(self,D):
         A = Object(D,"A",)
         B = Object(D,"B")
-        C = Object(D,"cokernel")
+        coker_f = Object(D,"coker_f")
         Morphism(A,B,"f")
-        Morphism(B,C,"coker_f")
+        Morphism(B,coker_f,"pcoker_f")
 
 class Exact(Property):
     name = "exact"

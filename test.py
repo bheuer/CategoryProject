@@ -380,10 +380,18 @@ class AbelianZeroObjectTest(unittest.TestCase):
         RM = RuleMaster(D,Rules = Rules, prioritiser = UltimateWeightPriotiser)
         for _ in xrange(20):
             RM.rule()
-        D.printCommutativity()
         
 class AbelianKernelTest(unittest.TestCase):
     def runTest(self):
+        '''
+                     f
+        ker f --> A ---> B --> coker f
+             \    |\   / |     /
+              \   | \0/  |   /
+               \  | /0 \ | /
+                  C      Z
+        
+        '''
         D = Diagram(category = AbelianCategory)
         
         A = Object(D,"A")
@@ -396,22 +404,40 @@ class AbelianKernelTest(unittest.TestCase):
         zerom = GiveZeroMorphism(C,B)
         Commute(f*g,zerom)
         
+        Z = Object(D,"Z")
+        h = Morphism(B,Z,"h")
+        
+        zerom = GiveZeroMorphism(A,Z)
+        Commute(h*f,zerom)
+        
         Rules = AbelianRules+[ComposeRule,ExistIdentity]
         RM = RuleMaster(D,Rules = Rules, prioritiser = UltimateWeightPriotiser)
-        for _ in xrange(10):
-            RM.rule(numberOfExtensions=5,verbose = False)
+        for _ in xrange(20):
+            RM.rule(numberOfExtensions=3,verbose = False)
         
         #the kernel has ben created
         assert D["ker_f"] is not None
         ker_f = D["ker_f"]
         
-        #and there is a non-trivial morphism C->ker_f
-        assert any(not isMorphismZero(m) for m in D.Morphisms[C][ker_f])
-        
+        #and it has the property that f*iker == 0
         iker = next(m for m in D.Morphisms[ker_f][A] if not isMorphismZero(m))
-        g_ = next(m for m in D.Morphisms[C][ker_f] if not isMorphismZero(m))
-        
         assert f*iker==GiveZeroMorphism(ker_f, B)
         
-        D.printCommutativity()
+        #and there is a non-trivial morphism g_: C->ker_f
+        assert any(not isMorphismZero(m) for m in D.Morphisms[C][ker_f])
+        g_ = next(m for m in D.Morphisms[C][ker_f] if not isMorphismZero(m))
         
+        #also the cokernel has ben created
+        assert D["coker_f"] is not None
+        coker_f = D["coker_f"]
+        
+        #and it has the property that coker*f == 0
+        pcoker_f = next(m for m in D.Morphisms[B][coker_f] if not isMorphismZero(m))
+        assert pcoker_f*f==GiveZeroMorphism(A,coker_f)
+        
+        #and there is a non-trivial morphism h_: coker_f -> Z
+        assert any(not isMorphismZero(m) for m in D.Morphisms[coker_f][Z])
+        h_ = next(m for m in D.Morphisms[coker_f][Z] if not isMorphismZero(m))
+        
+        #also, just for fun, ker->coker == 0
+        assert pcoker_f*f*ker_f
