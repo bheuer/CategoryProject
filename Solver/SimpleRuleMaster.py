@@ -1,6 +1,6 @@
 from Homomorphism.HomomorphismIterator import HomomorphismIterator
 from Rule.ExtensionRequest import ExtensionRequest
-from Rule.Rule import *
+from Rule import *
 from Solver.Prioritiser import UltimateWeightPriotiser
 from RuleMaster import *
 from IO.diagIO import latexDiag
@@ -11,7 +11,7 @@ class SimpleRuleMaster(RuleMaster):
             
         self.diagram = diagram
         #self.Rules = [ExistProduct()(),ProductRule()(),ProductRuleUnique()()]#self.diagram.category.Rules
-        self.Rules = [ExistIdentity()(),ProductRule()(),ProductRuleUnique()(),ProjectiveUP()(),InjectiveUP()(),ComposeRule(),CoProductRule()()]#self.diagram.category.Rules
+        self.Rules = [ExistIdentity,ProductRule,ProductRuleUnique,ProjectiveUP,InjectiveUP,ComposeRule,CoProductRuleGenerator()()]#self.diagram.category.Rules
         self.ExtensionRequests = []
         self.Prioritiser = prioritiser
         self.implemented = []

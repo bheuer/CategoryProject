@@ -4,7 +4,7 @@ from Solver.SimpleRuleMaster import SimpleRuleMaster
 from Solver.Prioritiser import UltimateWeightPriotiser
 from Property.Property import *
 from IO.diagIO import processDiagSequence,diagBuild, latexDiag, Display, DisplayAll, DisplayMorphism, DisplayAllMorphisms
-from Rule.Rule import *
+from Rule import *
 from Homomorphism.HomomorphismIterator import HomomorphismIterator
 from Rule.ExtensionRequest import ExtensionRequest
 
