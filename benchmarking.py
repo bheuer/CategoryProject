@@ -14,13 +14,11 @@ def test():
     ProductProperty(f,g)
     
     RM = RuleMaster(D,prioritiser = UltimateWeightPriotiser)
-    for i in xrange(10):
-        RM(verbose=True)
-        print D.MorphismList
-    print D.Properties
-    print D.MorphismList
+    for _ in xrange(10):
+        RM.rule(numberOfExtensions=3,verbose=True)
+    D.printCommutativity()
     print D.Objects
 
-
-from cProfile import run
-run("test()")
+test()
+#from cProfile import run
+#run("test()")

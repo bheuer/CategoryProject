@@ -58,6 +58,7 @@ class Property:
         self.charDiagram = Diagram()
         self.buildCharDiagram(self.charDiagram)
         self.homomorphism = self.processPropertyInput(args)
+        
         self.id = id(self)
         self.registerPropertyTags()
         
@@ -94,6 +95,10 @@ class Property:
     def processPropertyInput(self,args):
         if len(args)==1 and isinstance(args[0],Homomorphism):
             hom = args[0]
+            for e,image in hom.iterEdges():
+                if isinstance(image, CommutingMorphismEquivalenceClass):
+                    hom.set_edge_image(e, image.representative)
+            
             #assert hom.D1.is_isomorphic(self.charDiagram)
         elif len(args)==1 and isinstance(args[0],Diagram):
             raise NotImplementedError

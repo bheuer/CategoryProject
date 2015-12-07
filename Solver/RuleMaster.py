@@ -1,23 +1,19 @@
 from Homomorphism.HomomorphismIterator import HomomorphismIterator
 from Rule.ExtensionRequest import ExtensionRequest
-from Rule.Rule import ProductRule,ExistProduct,ProductRuleUnique,ExistIdentity
+from Rule import ProductRule,ExistProduct,ProductRuleUnique,ExistIdentity
 from Rule.Compose import ComposeRule, ComposeRequest
 from Solver.Prioritiser import UltimateWeightPriotiser
-
-def iscontainedin(item,list_):
-    #for unhashable items that have an equality
-    for i in list_:
-        if i==item:
-            return True
-    return False
+from Diagram.Diagram import iscontainedin
 
 class RuleMaster:
     
-    def __init__(self,diagram,prioritiser = None):
+    def __init__(self,diagram,prioritiser = None,Rules = None):
             
         self.diagram = diagram
         #self.Rules = [ExistProduct()(),ProductRule()(),ProductRuleUnique()()]#self.diagram.category.Rules
-        self.Rules = [ExistIdentity()(),ProductRule()(),ProductRuleUnique()(),ComposeRule()]#self.diagram.category.Rules
+        self.Rules = Rules
+        if Rules is None:
+            self.Rules = [ExistIdentity,ProductRule,ProductRuleUnique,ComposeRule]#self.diagram.category.Rules
         self.ExtensionRequests = []
         self.Prioritiser = prioritiser
         self.implemented = []
@@ -65,10 +61,10 @@ class RuleMaster:
                 continue
             
             if verbose:
-                print "________________\n\n apply new Rule:"
+                print "\n\n apply new Rule:"
                 print extensionRequest.rule.name
                 print extensionRequest.hom
-                print "with priority value {}\n________________\n"\
+                print "with priority value {}\n"\
                         .format(self.Prioritiser(extensionRequest))
             
             extensionRequest.implement()
@@ -76,10 +72,10 @@ class RuleMaster:
             ruleNumber+=1
         
         if verbose:
-            print "applied {} new rules".format(ruleNumber+1)
+            print "applied {} new rules".format(ruleNumber)
         return True
     
-    def rule_exhaustive(self,**kwargs):
+    def rule_exhaustively(self,**kwargs):
         if "max" in kwargs:
             max_ = kwargs["max"]
         else:

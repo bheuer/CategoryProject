@@ -112,6 +112,7 @@ class Homomorphism:
             str_+="|  {} -> {}\n".format(obj, self.nodeMap.get(obj))
         str_+="| Edges:\n"
         for edge in self.D1.MorphismList:
+            if len(edge.Composition)>1:continue
             str_+= "|  ({}) -> ({})\n".format(edge,self.edgeMap.get(edge))
         return str_
     

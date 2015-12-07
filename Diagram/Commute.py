@@ -20,6 +20,7 @@ def pairwise(iterable):#from http://stackoverflow.com/questions/5434891/iterate-
 
 class Commute:
     weight = -30
+    name = "Commute"
     def __init__(self,*args):
         # check that all arguments are morphisms and aligned
         if not (len(args)>0 and all(isinstance(i,AbstractMorphism) for i in args)):

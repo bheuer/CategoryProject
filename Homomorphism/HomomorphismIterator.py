@@ -1,6 +1,8 @@
 from Homomorphism.base import Homomorphism
 from networkx.algorithms.components.weakly_connected import weakly_connected_components
 from Diagram.Commute import Commute,Distinct
+from Rule.abelianRules import isMorphismZero
+from Rule import NonZeroMorphism
 
 class HomomorphismIterator:
     def __init__(self,D1,D2):
@@ -35,11 +37,10 @@ class HomomorphismIterator:
     def globalPropertyCheck(self):
         for prop in self.D1.Properties:
             if isinstance(prop,Commute):
+                
                 ECs =  [self.hom.get_edge_image(morph) for morph in prop.MorphiList]
                 if not all(i==ECs[0] for i in ECs):
                     return False
-                    
-                
                 
             elif isinstance(prop, Distinct):
                 #check that no two morphisms of the indicated morphis are mapped to the same image
@@ -47,6 +48,11 @@ class HomomorphismIterator:
                 for e in ECs:
                     if ECs.count(e)>1:
                         return False
+            elif isinstance(prop, NonZeroMorphism):
+                #check that morphism is not known to be zero
+                EC =  self.hom.get_edge_image(prop.morph)
+                if isMorphismZero(EC):
+                    return False
             else:
                 #check whether the locally matched properties glue together to match to
                 #a global property

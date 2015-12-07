@@ -161,6 +161,10 @@ class Morphism(AbstractMorphism):
         
         AbstractMorphism.__init__(self,source,target)
         
+        if not dry: 
+            assert name not in self.diagram.UNIVERSE
+            
+        
         #create list of constituting user-defined Morphisms
         self.Composition = []
         for morphi in morphilist:
