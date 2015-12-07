@@ -1,9 +1,10 @@
 from Homomorphism.base import Homomorphism
 from networkx.algorithms.components.weakly_connected import weakly_connected_components
 from Diagram.Commute import Commute,Distinct
-from Rule import NonZeroMorphism
-from Rule.abelianProperty import NonZeroObject,isMorphismZero, GiveZeroMorphism,\
-    AbelianCategory
+from Rule.abelianProperty import NonZeroMorphism,NonZeroObject,isMorphismZero, GiveZeroMorphism,\
+    AbelianCategory, NonIsoMorphism, isIsomorphism
+from Diagram.Morphisms import Identity
+from Property.Property import getIdentity
 
 class HomomorphismIterator:
     def __init__(self,D1,D2):
@@ -16,7 +17,7 @@ class HomomorphismIterator:
         if self.D2.category == AbelianCategory:
             self.hom = AbelianHomomorphism(self.D1,self.D2)
         else:
-            self.hom = Homomorphism(self.D1,self.D2)
+            self.hom = BetterHomomorphism(self.D1,self.D2)
             
     
     def initialize(self):
@@ -59,6 +60,11 @@ class HomomorphismIterator:
                 #check that morphism is not known to be zero
                 EC =  self.hom.get_edge_image(prop.morph)
                 if isMorphismZero(EC):
+                    return False
+            elif isinstance(prop, NonIsoMorphism):
+                #check that morphism is not known to be zero
+                EC =  self.hom.get_edge_image(prop.morph)
+                if isIsomorphism(EC):
                     return False
             elif isinstance(prop, NonZeroObject):
                 #check that morphism is not known to be zero
@@ -210,7 +216,14 @@ class HomomorphismIterator:
             self.hom.edgeMap[morphi] = None
             self.hom.nodeMap[neighbour] = None
 
-
+class BetterHomomorphism(Homomorphism):
+    def get_edge_image(self,item):
+        res = Homomorphism.get_edge_image(self,item)
+        if res is not None:
+            return res
+        if isinstance(item,Identity):
+            return getIdentity(self.edgeMap[item.source])
+                
 class AbelianHomomorphism(Homomorphism):
     def get_edge_image(self,item):
         if self.edgeMap.has_key(item):
@@ -229,3 +242,5 @@ class AbelianHomomorphism(Homomorphism):
                 
                 morphi = morphi.compose(atomicimage)
             return morphi
+        elif isinstance(item,Identity):
+            return getIdentity(self.edgeMap[item.source])

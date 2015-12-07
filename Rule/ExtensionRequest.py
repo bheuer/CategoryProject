@@ -1,5 +1,6 @@
 from Diagram import Morphism,Object,Identity
 from Rule.abelianProperty import GiveZeroMorphism,isMorphismZero
+from Property.Property import getIdentity
 
 
 class ExtensionRequest:
@@ -126,7 +127,7 @@ class ExtensionRequest:
             source = lift[morphi.source]
             target = lift[morphi.target]
             if isinstance(morphi,Identity):
-                newmorphi = Identity(source)
+                newmorphi = getIdentity(source)
             elif isMorphismZero(morphi):
                 newmorphi = GiveZeroMorphism(source,target)
             else:

@@ -10,7 +10,9 @@ from Solver.Prioritiser import UltimateWeightPriotiser
 from Rule import EpimorphismRule, MonomorphismRule, ExistIdentity,\
     ProductRuleUnique, CoProductRuleUnique, FibreProductRuleUnique, FibreProductRule, AbelianRules
 from Rule.Compose import ComposeRule
-from Rule.abelianProperty import AbelianCategory, Kernel, GiveZeroMorphism,isMorphismZero
+from Rule.abelianProperty import AbelianCategory, Kernel, GiveZeroMorphism,isMorphismZero,\
+    Exact, reprWithoutZeros, getCokernel, getKernel, iterNonZeroMorphisms,\
+    isIsomorphism
 
 class CompositionTestCase(unittest.TestCase):
     def runTest(self):
@@ -412,12 +414,12 @@ class AbelianKernelTest(unittest.TestCase):
         
         Rules = AbelianRules+[ComposeRule,ExistIdentity]
         RM = RuleMaster(D,Rules = Rules, prioritiser = UltimateWeightPriotiser)
-        for _ in xrange(20):
+        for _ in xrange(10):
             RM.rule(numberOfExtensions=3,verbose = False)
         
         #the kernel has ben created
-        assert D["ker_f"] is not None
-        ker_f = D["ker_f"]
+        assert D["ker_(f)"] is not None
+        ker_f = D["ker_(f)"]
         
         #and it has the property that f*iker == 0
         iker = next(m for m in D.Morphisms[ker_f][A] if not isMorphismZero(m))
@@ -428,8 +430,8 @@ class AbelianKernelTest(unittest.TestCase):
         g_ = next(m for m in D.Morphisms[C][ker_f] if not isMorphismZero(m))
         
         #also the cokernel has ben created
-        assert D["coker_f"] is not None
-        coker_f = D["coker_f"]
+        assert D["coker_(f)"] is not None
+        coker_f = D["coker_(f)"]
         
         #and it has the property that coker*f == 0
         pcoker_f = next(m for m in D.Morphisms[B][coker_f] if not isMorphismZero(m))
@@ -440,4 +442,32 @@ class AbelianKernelTest(unittest.TestCase):
         h_ = next(m for m in D.Morphisms[coker_f][Z] if not isMorphismZero(m))
         
         #also, just for fun, ker->coker == 0
-        assert pcoker_f*f*ker_f
+        assert pcoker_f*f*iker==GiveZeroMorphism(ker_f,coker_f)
+
+class AbelianExactnessTest(unittest.TestCase):
+    def runTest(self):
+        D = Diagram(category=AbelianCategory)
+        A = Object(D,"A")
+        B = Object(D,"B")
+        C = Object(D,"C")
+        
+        f = Morphism(A,B,"f")
+        g = Morphism(B,C,"g")
+        
+        Exact(f,g)
+        Rules = AbelianRules+[ComposeRule,ExistIdentity]
+        RM = RuleMaster(D,Rules = Rules, prioritiser = UltimateWeightPriotiser)
+        for _ in xrange(60):
+            RM.rule(numberOfExtensions=1,verbose = False)
+        
+        
+        pcoker_f = getCokernel(f)
+        iker_g = getKernel(g)
+        iker_pcoker_f = getKernel(pcoker_f)
+        
+        ker_g = iker_g.source
+        ker_coker_f = iker_pcoker_f.source
+        
+        psi = next(iterNonZeroMorphisms(ker_coker_f,ker_g))
+        assert isIsomorphism(psi)
+        reprWithoutZeros(D)

@@ -5,6 +5,7 @@ from Graph import IamTiredOfNetworkxNotHavingAnEdgeObjectGraph
 from Commute import CommutingMorphismEquivalenceClass
 from Homomorphism.base import Homomorphism
 from Category import Category,GenericCategory
+from Morphisms import Identity, getIdentity
 
 class Diagram(object):
     def __init__(self,category = None):
@@ -16,6 +17,10 @@ class Diagram(object):
         self.UNIVERSE = set([])
         self.Rules = []
         
+        if category is None:
+            category = GenericCategory
+        self.category = category
+        
         self.CommutativityQuotient = Homomorphism(self,self)
         self.CommutativitySection = Homomorphism(self,self)
         
@@ -23,9 +28,6 @@ class Diagram(object):
         self.MorphismNames = set()
         self.Properties = []
         
-        if category is None:
-            category = GenericCategory
-        self.category = category
         
         for O in self.category.SpecialObjects:
             O(self) # initialize object
@@ -87,13 +89,24 @@ class Diagram(object):
             if partial_m.name == morph.name:#infinite recursion and doesn't make sense
                 continue
             
-            for partial_m2 in self.CommutativityQuotient.get_edge_image(partial_m):
+            for partial_m2 in partial_m.equivalenceClass():
                 if partial_m2.name == partial_m.name:
                     continue
-                newmorph = end.compose(partial_m2.compose(start,dry = True),dry = True)
-                if newmorph in self.MorphismList:
+                newmorph = Morphism([end,partial_m2,start],dry = True)
+                if newmorph.name in self.MorphismNames:
                     self.unify(morph,newmorph)
-
+                #otherwise add and set equal, but be aware of infinite recursion by cycles.
+                #this is not exhausstive, but it hardcodes avodiing cycles
+                elif len(newmorph.Composition)<=len(morph.Composition) or not isCyclic(newmorph):
+                    if isMorphismZero(partial_m2):
+                        if not isMorphismZero(morph):
+                            self.unify(morph,GiveZeroMorphism(source,target))
+                    else:
+                        
+                        newmorph = Morphism([end,partial_m2,start])
+                        self.unify(morph,newmorph)
+                
+                
     def addProperty(self,prop):
         self.Properties.append(prop)
     
@@ -110,7 +123,6 @@ class Diagram(object):
         if EC1==EC2:
             #nothing to do
             return
-        
         #morph1 and morph2 belong to the same Commutativity Class
         
         edge1 = self.EquivalenceGraph.InverseLookUp[EC1]
@@ -180,6 +192,7 @@ class Diagram(object):
             quot = s.equivalenceClass()
             if iscontainedin(quot, printed):
                 continue
+            
             str_+="\n| "+str(quot)
             printed.append(quot)
         return str_
@@ -195,6 +208,66 @@ def iscontainedin(item,list_):
     for i in list_:
         if i==item:
             return True
+    return False
+
+        
+def GiveZeroMorphism(A,B):
+    '''
+    cerfully creates the zero morphism
+    defines the corresponding maps A->0 and 0->B
+    and A->0->B only if not defined before, otherwise
+    takes those (any) that the diagram knows already
+    '''
+    
+    assert A.diagram == B.diagram
+    D = A.diagram
+    zero = D["0"]
+    
+    if D.Morphisms[A][zero]:
+        f0 = D.Morphisms[A][zero][0]
+    else:
+        f0 = Morphism(A,zero)
+        
+    if D.Morphisms[zero][B]:
+        g0 = D.Morphisms[zero][B][0]
+    else:
+        g0 = Morphism(zero,B)
+    
+    return g0*f0
+
+def isMorphismZero(m):
+    A = m.source
+    B = m.target
+    if A.name=="0" or B.name=="0":
+        return True
+    
+    D = m.diagram
+    zero = D["0"]
+    
+    if isinstance(m,Morphism):
+        m = m.equivalenceClass()
+    
+    if not D.Morphisms[A][zero]:
+        return False
+    f0 = D.Morphisms[A][zero][0]
+    
+    if not D.Morphisms[zero][B]:
+        return False
+    g0 = D.Morphisms[zero][B][0]
+    
+    if (g0*f0)==m.representative:
+        return True
+    
+    for p in m.diagram.EquivalenceGraph.InverseLookUp[m]["propertyTags"]:
+        if p.prop_name == "zeromorphism":
+            return True
+    return False
+
+def isCyclic(morph):
+    objs = [o.source.name for o in morph.Composition]
+    objs.append( morph.target.name)
+    if any(objs.count(n)>1 for n in objs):
+        return True
     return False
 
     
