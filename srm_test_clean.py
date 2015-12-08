@@ -125,12 +125,6 @@ def test4():
         diagSequence.append(result)
     print processDiagSequence(diagSequence)
 
-#    RM = RuleMaster(D,Rules = [FibreProductRuleUnique,FibreProductRule,ComposeRule])
-#            
-#    RM.rule_exhaustively()
-#    print latexDiag(D)
     return D
-
-
 D=test4()
 
