@@ -1,10 +1,10 @@
 from Homomorphism.base import Homomorphism
 from networkx.algorithms.components.weakly_connected import weakly_connected_components
-from Diagram.Commute import Commute,Distinct
+from Diagram.Commute import Commute,Distinct, DistinctObjects
 from Rule.abelianProperty import isMorphismZero, GiveZeroMorphism,\
     AbelianCategory, isIsomorphism, ZeroObject, ZeroMorphism
 from Diagram.Morphisms import Identity
-from Property.Property import getIdentity, IsNot, Isomorphism
+from Property.Property import getIdentity, IsNot, Isomorphism, MorphismsProperty
 
 class HomomorphismIterator:
     def __init__(self,D1,D2):
@@ -56,6 +56,13 @@ class HomomorphismIterator:
                 for e in ECs:
                     if ECs.count(e)>1:
                         return False
+            elif isinstance(prop, DistinctObjects):
+                #check that no two morphisms of the indicated morphis are mapped to the same image
+                Obs =  [self.hom[o] for o in prop.ObjectList]
+                for o in Obs:
+                    if Obs.count(o)>1:
+                        return False        
+            
             elif isinstance(prop, IsNot):
                 continue
             else:
@@ -123,7 +130,10 @@ class HomomorphismIterator:
                     if isIsomorphism(morph):
                         return False
                 else:
-                    assert False,notprop
+                    assert issubclass(notprop,MorphismsProperty)
+                    for p2 in P2:
+                        if isinstance(p2.prop,notprop):
+                            return False  
             else:
                 if propTag not in P2: # P1 subset P2
                     return False

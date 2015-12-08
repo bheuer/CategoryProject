@@ -3,7 +3,9 @@ from base import RuleGenerator
 from Rule.abelianProperty import ZeroMorphism, Kernel, ZeroObject,\
     SetEqualZero, CoKernel, Exactness
 from Rule.abelianProperty import GiveZeroMorphism, AbelianCategory
-from Property.Property import Isomorphism, SetIsomorphism, IsNot
+from Property.Property import Isomorphism, SetIsomorphism, IsNot, Monomorphism,\
+    Epimorphism
+from Diagram.Commute import DistinctObjects
 
 
 class InitialExistRuleGenerator(RuleGenerator):
@@ -63,11 +65,13 @@ class KernelExistRuleGenerator(RuleGenerator):
         f = Morphism(A,B,"f")
         IsNot(ZeroMorphism,f)
         IsNot(Isomorphism,f)
+        IsNot(Monomorphism,f)
         
     def conclude(self,CD):
         K = Object(CD,"ker_f")
         K.namescheme=('ker_({})',('f'))
         iker = Morphism(K,CD["A"])
+        Monomorphism(iker)
         iker.namescheme=('i_ker_{}',('f'))
         Kernel(CD["f"],iker)
         ZeroMorphism(CD["f"]*iker)
@@ -92,6 +96,8 @@ class KernelUniversalRuleGenerator(RuleGenerator):
         Kernel(f,iker)
         
         C = Object(CD,"C")
+        DistinctObjects(C,K)
+        
         g = Morphism(C,A,"g")
         IsNot(ZeroMorphism,g)
         
@@ -151,12 +157,16 @@ class CoKernelExistRuleGenerator(RuleGenerator):
         f = Morphism(A,B,"f")
         IsNot(ZeroMorphism,f)
         IsNot(Isomorphism,f)
+        IsNot(Epimorphism,f)
         
     def conclude(self,CD):
         coker_f = Object(CD,"coker_f")
         coker_f.namescheme=('coker_({})',('f'))
+        
         pcoker_f = Morphism(CD["B"],coker_f)
         pcoker_f.namescheme=('i_ker_{}',('f'))
+        Epimorphism(pcoker_f)
+        
         CoKernel(CD["f"],pcoker_f)
         ZeroMorphism(pcoker_f*CD["f"])
         
@@ -183,6 +193,8 @@ class CoKernelUniversalRuleGenerator(RuleGenerator):
         CoKernel(f,pcoker_f)
         
         C = Object(CD,"C")
+        DistinctObjects(C,coker_f)
+        
         g = Morphism(B,C,"g")
         IsNot(ZeroMorphism,g)
         
