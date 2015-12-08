@@ -96,6 +96,7 @@ def processCellMatrix(n,k,cells):
                 else:
                     mrphs[(i,j,i+ar[0],j+ar[1])].append((ar[2],ar[3],ar[4]))
             objs[(i,j)].gridpos=(i,j)
+            objs[(i,j)].latex=objs[(i,j)].name
     #now that all objects exist we can construct morphisms
     for (i1,j1,i2,j2) in mrphs:
         if mrphs.has_key((i1,j1,i2,j2)):

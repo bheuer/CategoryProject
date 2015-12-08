@@ -79,5 +79,27 @@ def test2():
     print processDiagSequence(diagSequence)
     return D
 
-D=test2()
+def test3():
+    str_=r"""P_1 \ar{r}{i1} & P_1 \oplus P_2 \ar[bend left]{dd}{f} & P_2 \ar{l}{i2}\\
+        & A \ar{d}{\pi} & \\
+        & B &"""
+
+    D=diagBuild(str_)       #construct a diagram D from this input
+                            #Also, tell the program about the following assumptions:
+    Projective(D['P_1'])        #the object of D named 'P_1' is projective
+    Projective(D['P_2'])        #the object of D named 'P_2' is projective
+    Epimorphism(D[r'\pi'])      #the morphism named '\pi' is an epimorphism
+    CoProductProperty(D['i1'],D['i2']) #P_1 \oplus P_2 is a coproduct with canonical embeddings i1,i2
+
+    SRM = SimpleRuleMaster(D,maxMorphisms=1)
+    diagSequence=[]
+    while(True):
+        result=SRM(numberOfExtensions=10,verbose=False,printlatex=True)
+        if (result==False):
+            break
+        diagSequence.append(result)
+    print processDiagSequence(diagSequence)
+    return D
+
+D=test3()
 
