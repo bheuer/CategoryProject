@@ -1,6 +1,7 @@
 from base import Property
 from Diagram import Diagram,Object,Morphism,Commute
 from Diagram.Morphisms import Identity, getIdentity
+from base import PropertyTag
 
 class MorphismsProperty(Property):
     def __init__(self,*args):
@@ -74,6 +75,22 @@ class FibreProductProperty(Property):
         g = Morphism(B,C,"g")
         #Commute(f*pi1,g*pi2) #not necessary
 
+class IsNot:#Pseudoproperty Generator like Non(ZeroMorphism)
+    name = "isnot"
+    def __init__(self,notprop,f):
+        assert isinstance(f,Morphism) or isinstance(f,Object)
+        self.obj = f
+        self.notprop = notprop
+        diagram = f.diagram
+        diagram.addProperty(self)
+        
+        propTag = PropertyTag(self,f.name,id(self))
+        if isinstance(f,Object):
+            diagram.Graph.node[f]["propertyTags"].append(propTag)
+            diagram.EquivalenceGraph.node[f]["propertyTags"].append(propTag)
+        elif isinstance(f,Morphism):
+            diagram.appendPropertyTag(f,propTag)
+            
 def SetIsomorphism(m):
     minverse = Morphism(m.target,m.source)
     

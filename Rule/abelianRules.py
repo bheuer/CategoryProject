@@ -1,9 +1,9 @@
 from Diagram import *
 from base import RuleGenerator
-from Rule.abelianProperty import ZeroMorphism, NonZeroMorphism, Kernel, ZeroObject,\
-    SetEqualZero, CoKernel, NonIsoMorphism, Exactness
-from Rule.abelianProperty import GiveZeroMorphism, NonZeroObject, AbelianCategory
-from Property.Property import Isomorphism, SetIsomorphism
+from Rule.abelianProperty import ZeroMorphism, Kernel, ZeroObject,\
+    SetEqualZero, CoKernel, Exactness
+from Rule.abelianProperty import GiveZeroMorphism, AbelianCategory
+from Property.Property import Isomorphism, SetIsomorphism, IsNot
 
 
 class InitialExistRuleGenerator(RuleGenerator):
@@ -27,8 +27,8 @@ class ZeroMorphismExistRuleGenerator(RuleGenerator):
     def CharacteristicDiagram(self, CD):
         A = Object(CD,"A")
         B = Object(CD,"B")
-        NonZeroObject(A)
-        NonZeroObject(B)
+        IsNot(ZeroObject,A)
+        IsNot(ZeroObject,B)
     def conclude(self,CD):
         f = Morphism(CD["A"],CD["B"])
         ZeroMorphism(f)
@@ -61,8 +61,8 @@ class KernelExistRuleGenerator(RuleGenerator):
         A = Object(CD,"A")
         B = Object(CD,"B")
         f = Morphism(A,B,"f")
-        NonZeroMorphism(f)
-        NonIsoMorphism(f)
+        IsNot(ZeroMorphism,f)
+        IsNot(Isomorphism,f)
         
     def conclude(self,CD):
         K = Object(CD,"ker_f")
@@ -93,7 +93,7 @@ class KernelUniversalRuleGenerator(RuleGenerator):
         
         C = Object(CD,"C")
         g = Morphism(C,A,"g")
-        NonZeroMorphism(g)
+        IsNot(ZeroMorphism,g)
         
         SetEqualZero(f*g)
     
@@ -125,7 +125,7 @@ class KernelUniqueRuleGenerator(RuleGenerator):
         
         C = Object(CD,"C")
         g = Morphism(C,A,"g")
-        NonZeroMorphism(g)
+        IsNot(ZeroMorphism,g)
         
         phi1 = Morphism(C,K,"phi1")
         phi2 = Morphism(C,K,"phi2")
@@ -149,8 +149,8 @@ class CoKernelExistRuleGenerator(RuleGenerator):
         A = Object(CD,"A")
         B = Object(CD,"B")
         f = Morphism(A,B,"f")
-        NonZeroMorphism(f)
-        NonIsoMorphism(f)
+        IsNot(ZeroMorphism,f)
+        IsNot(Isomorphism,f)
         
     def conclude(self,CD):
         coker_f = Object(CD,"coker_f")
@@ -184,7 +184,7 @@ class CoKernelUniversalRuleGenerator(RuleGenerator):
         
         C = Object(CD,"C")
         g = Morphism(B,C,"g")
-        NonZeroMorphism(g)
+        IsNot(ZeroMorphism,g)
         
         SetEqualZero(g*f)
     
@@ -219,7 +219,7 @@ class CoKernelUniqueRuleGenerator(RuleGenerator):
         C = Object(CD,"C")
         g = Morphism(B,C,"g")
         
-        NonZeroMorphism(g)
+        IsNot(ZeroMorphism,g)
         
         phi1 = Morphism(coker_f,C,"phi1")
         phi2 = Morphism(coker_f,C,"phi2")

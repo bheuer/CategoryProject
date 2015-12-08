@@ -1,10 +1,10 @@
 from Homomorphism.base import Homomorphism
 from networkx.algorithms.components.weakly_connected import weakly_connected_components
 from Diagram.Commute import Commute,Distinct
-from Rule.abelianProperty import NonZeroMorphism,NonZeroObject,isMorphismZero, GiveZeroMorphism,\
-    AbelianCategory, NonIsoMorphism, isIsomorphism
+from Rule.abelianProperty import isMorphismZero, GiveZeroMorphism,\
+    AbelianCategory, isIsomorphism, ZeroObject, ZeroMorphism
 from Diagram.Morphisms import Identity
-from Property.Property import getIdentity
+from Property.Property import getIdentity, IsNot, Isomorphism
 
 class HomomorphismIterator:
     def __init__(self,D1,D2):
@@ -56,21 +56,8 @@ class HomomorphismIterator:
                 for e in ECs:
                     if ECs.count(e)>1:
                         return False
-            elif isinstance(prop, NonZeroMorphism):
-                #check that morphism is not known to be zero
-                EC =  self.hom.get_edge_image(prop.morph)
-                if isMorphismZero(EC):
-                    return False
-            elif isinstance(prop, NonIsoMorphism):
-                #check that morphism is not known to be zero
-                EC =  self.hom.get_edge_image(prop.morph)
-                if isIsomorphism(EC):
-                    return False
-            elif isinstance(prop, NonZeroObject):
-                #check that morphism is not known to be zero
-                o =  self.hom[prop.obj]
-                if o.name =="0":
-                    return False
+            elif isinstance(prop, IsNot):
+                continue
             else:
                 #check whether the locally matched properties glue together to match to
                 #a global property
@@ -103,12 +90,44 @@ class HomomorphismIterator:
     def doNodesMatch(self,node1,node2):
         P1 = self.G1.node[node1]["propertyTags"]
         P2 = self.G2.node[node2]["propertyTags"]
-        return all(p in P2 for p in P1)#P1 subset P2
+        for propTag in P1:
+            prop = propTag.prop
+            if isinstance(prop, IsNot):
+                notprop = prop.notprop
+                if notprop is ZeroObject:
+                    if node2.name =="0":
+                        return False
+                else:
+                    assert False,notprop
+            else:
+                if propTag not in P2: # P1 subset P2
+                    return False
+        return True
             
     def doEdgesMatch(self,edge1,edge2):
         P1 = edge1["propertyTags"]
         P2 = edge2["propertyTags"]
-        return all(p in P2 for p in P1)#P1 subset P2
+        
+        for propTag in P1:
+            prop = propTag.prop
+            if isinstance(prop, IsNot):
+                notprop = prop.notprop
+                morph = edge2["morphism"]
+                #check that morphism is not known to be zero
+                if notprop is ZeroMorphism:
+                    if isMorphismZero(morph):
+                        return False
+                
+                elif notprop is Isomorphism:
+                    #check that morphism is not known to be zero
+                    if isIsomorphism(morph):
+                        return False
+                else:
+                    assert False,notprop
+            else:
+                if propTag not in P2: # P1 subset P2
+                    return False
+        return True
     
     def matchComponents(self,index = 0):
         if index==len(self.componentRepresentatives):

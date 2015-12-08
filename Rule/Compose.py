@@ -2,8 +2,7 @@ from ExtensionRequest import ExtensionRequest
 from Diagram import Object,Morphism,Diagram
 from Homomorphism.base import Homomorphism
 from base import Rule
-from abelianProperty import ZeroObject, ZeroMorphism
-from Rule.abelianProperty import NonZeroMorphism,isMorphismZero
+from Rule.abelianProperty import isMorphismZero
 
 CD = Diagram()
 A = Object(CD,"A") 
