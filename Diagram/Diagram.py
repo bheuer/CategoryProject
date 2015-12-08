@@ -25,6 +25,7 @@ class Diagram(object):
         self.CommutativitySection = Homomorphism(self,self)
         
         self.MorphismList = []
+        self.MorphismByName = {}
         self.MorphismNames = set()
         self.Properties = []
         
@@ -72,6 +73,7 @@ class Diagram(object):
         self.MorphismNames.add(morph.name)
         
         self.MorphismList.append(morph)
+        self.MorphismByName[morph.name]=morph
         
         self.Graph.add_edge(source,target,morphism = morph,propertyTags = [])
         
@@ -125,10 +127,12 @@ class Diagram(object):
             return
         #morph1 and morph2 belong to the same Commutativity Class
         
+        pT = self.getEqPropertyTags(EC2)
+        
         edge1 = self.EquivalenceGraph.InverseLookUp[EC1]
         self.EquivalenceGraph.overwrite_edge(EC2,edge1)
         
-        EC1.merge_with(EC2)
+        EC1.merge_with(EC2,pT)
         
         for m,id3 in self.CommutativityQuotient.iterEdges():
             if id3==EC2:
@@ -157,10 +161,14 @@ class Diagram(object):
     def getPropertyTags(self,morph):
         return self.Graph.InverseLookUp[morph]["propertyTags"]
     
+    def getEqPropertyTags(self,morph):
+        return self.EquivalenceGraph.InverseLookUp[morph]["propertyTags"]
+    
+    
     def appendPropertyTag(self,morph,propTag):
         self.Graph.InverseLookUp[morph]["propertyTags"].append(propTag)
         quot = morph.equivalenceClass()
-        self.EquivalenceGraph.InverseLookUp[quot]["propertyTags"].append(propTag)
+        self.getEqPropertyTags(quot).append(propTag)
         
     def addName(self,name):
         if name in self.UNIVERSE:
@@ -258,7 +266,7 @@ def isMorphismZero(m):
     if (g0*f0)==m.representative:
         return True
     
-    for p in m.diagram.EquivalenceGraph.InverseLookUp[m]["propertyTags"]:
+    for p in m.diagram.getEqPropertyTags(m):
         if p.prop_name == "zeromorphism":
             return True
     return False

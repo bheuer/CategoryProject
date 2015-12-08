@@ -11,7 +11,7 @@ commutativity check should be O(1), so we do an expensive update of all commutat
 from Morphisms import Morphism, AbstractMorphism,Identity
 from Homomorphism import Homomorphism
 import itertools
-from itertools import product
+from Object import Object
 
 
 def pairwise(iterable):#from http://stackoverflow.com/questions/5434891/iterate-a-list-as-pair-current-next-in-python
@@ -77,7 +77,7 @@ class CommutingMorphismEquivalenceClass(AbstractMorphism):
         for m in morphisms:
             self.PropertyTags+=m.diagram.getPropertyTags(m)
     
-    def merge_with(self,CMEC):
+    def merge_with(self,CMEC,pT):
         #morphism classes must be aligned
         assert self//CMEC
         m = self.representative #pick any representing morphism
@@ -88,7 +88,8 @@ class CommutingMorphismEquivalenceClass(AbstractMorphism):
             return
          
         self.Morphisms.update(CMEC.Morphisms)
-        self.PropertyTags += CMEC.PropertyTags
+        for p in pT:
+            self.diagram.EquivalenceGraph.InverseLookUp[self]["propertyTags"].append(p)
     
     def __iter__(self):
         for m in self.Morphisms:
@@ -128,6 +129,17 @@ class Distinct:#says that at least two of the morphisms don't commute
     
     def push_forward(self,hom):
         pass
+
+class DistinctObjects:#says that at least two of the morphisms don't commute
+    def __init__(self,*args):
+        assert len(args)>0 and all(isinstance(i,Object) for i in args)
+        self.ObjectList = args
+        diagram = args[0].diagram
+        diagram.addProperty(self)
+    
+    def push_forward(self,hom):
+        pass
+
 
 def commutes(*args):
     if len(args)==1:
