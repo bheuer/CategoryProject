@@ -279,6 +279,8 @@ class ExactnessExistsIsomorphismRuleGenerator(RuleGenerator):
         iker_pcoker_f = Morphism(ker_pcoker_f,B,"iker_pcoker_f")
         Kernel(pcoker_f,iker_pcoker_f)
         
+        DistinctObjects(ker_pcoker_f,ker_g) #otherwise for s.e.s we state Isomorphism(identity)
+        
         psi = Morphism(ker_pcoker_f,ker_g,"psi")
         
         Commute(iker_g*psi,iker_pcoker_f)

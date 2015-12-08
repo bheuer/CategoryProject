@@ -69,33 +69,6 @@ class Exactness(Property):
         C = Object(D,"C")
         Morphism(A,B,"f")
         Morphism(B,C,"g")
-     
-class NonZeroMorphism:#Pseudoproperty like "Distinct"
-    name = "nonzeromorphism"
-    def __init__(self,f):
-        assert isinstance(f,Morphism)
-        self.morph = f
-        diagram = f.diagram
-        diagram.addProperty(self)
-        
-class NonZeroObject:
-    name = "nonzeromorphism"
-    def __init__(self,o):
-        assert isinstance(o,Object)
-        self.obj = o
-        diagram = o.diagram
-        diagram.addProperty(self)
-
-     
-class NonIsoMorphism:#Pseudoproperty like "Distinct"
-    name = "nonisomorphism"
-    def __init__(self,f):
-        assert isinstance(f,Morphism)
-        self.morph = f
-        diagram = f.diagram
-        diagram.addProperty(self)
-        
-
 
 def isMorphismZero(m):
     A = m.source

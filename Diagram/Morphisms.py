@@ -67,7 +67,7 @@ class AbstractMorphism(object):
 def isWellDefined(ListOfMorphisms):
     n = len(ListOfMorphisms)
     for i in xrange(n-1):
-        if not ListOfMorphisms[i]<ListOfMorphisms[i+1]:#source of i==target of i+1
+        if not ListOfMorphisms[i].source == ListOfMorphisms[i+1].target:#source of i==target of i+1
             return False
     return True
 
@@ -191,8 +191,8 @@ class Morphism(AbstractMorphism):
         return self.hashvalue
     
     def __eq__(self,morphi):
-        if not isinstance(morphi,Morphism):
-            raise ValueError
+        #if not isinstance(morphi,Morphism):
+        #    raise ValueError
         
         if not self // morphi:
             return False
@@ -268,7 +268,7 @@ class Identity(Morphism):
 def getIdentity(A):
     id_ = A.diagram["id_"+A.name]
     if id_ is None:
-        A.diagram["id_("+A.name+")"]
+        id_ = A.diagram["id_("+A.name+")"]
     if id_ is None:
         return Identity(A)
     return id_
