@@ -45,9 +45,9 @@ class AbstractMorphism(object):
         if isinstance(g,Identity):
             return self
         c = Morphism([self,g],dry=True)
-        for m in self.diagram.MorphismList:
-            if m==c:
-                return m
+        m = self.diagram.MorphismByName.get(c.name)
+        if m is not None:
+            return m
         return Morphism([self,g],dry=dry)
     
     def __mul__(self,g):
@@ -61,7 +61,6 @@ class AbstractMorphism(object):
         return AbstractMorphism.__lt__(morph,self)
     
     def __floordiv__(self,morph):
-        assert isinstance(morph,AbstractMorphism)
         return self.target==morph.target and self.source==morph.source
     
 
