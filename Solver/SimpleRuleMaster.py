@@ -11,7 +11,7 @@ class SimpleRuleMaster(RuleMaster):
             
         self.diagram = diagram
         #self.Rules = [ExistProduct()(),ProductRule()(),ProductRuleUnique()()]#self.diagram.category.Rules
-        self.Rules = [ExistIdentity,ProductRule,ProductRuleUnique,ProjectiveUP,InjectiveUP,ComposeRule,CoProductRuleGenerator()()]#self.diagram.category.Rules
+        self.Rules = [ExistIdentity,ProductRule,ProductRuleUnique,ProjectiveUP,InjectiveUP,ComposeRule,CoProductRuleGenerator()(),FibreProductRuleGenerator()(),FibreProductRuleUniqueGenerator()()]#self.diagram.category.Rules
         self.ExtensionRequests = []
         self.Prioritiser = prioritiser
         self.implemented = []
