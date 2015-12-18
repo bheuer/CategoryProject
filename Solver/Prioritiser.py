@@ -62,12 +62,12 @@ Weights = defaultdict(int,{ \
                        "ExistProduct":10,\
                        "ProductRuleUnique":-30,\
                        "ExistIdentity":-100,\
-                       "KernelUniversalRule":-100,\
+                       "KernelUniversalRule":-200,\
                        "KernelUniqueRule":-100,\
-                       "CoKernelUniversalRule":-100,\
-                       "CoKernelUniversalRule":-100,
-                       "InitialExistRule":100,
-                       "FinalExistRule":100,
+                       "CoKernelUniversalRule":-200,\
+                       "CoKernelUniqueRule":-200,
+                       "InitialExistRule":300,
+                       "FinalExistRule":300,
                        "ZeroMorphismExistRule":1000,
                        "ExactnessExistsIsomorphismRule":-200,
                        })

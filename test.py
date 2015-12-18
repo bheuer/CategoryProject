@@ -414,8 +414,8 @@ class AbelianKernelTest(unittest.TestCase):
         
         Rules = AbelianRules+[ComposeRule,ExistIdentity]
         RM = RuleMaster(D,Rules = Rules, prioritiser = UltimateWeightPriotiser)
-        for _ in xrange(10):
-            RM.rule(numberOfExtensions=3,verbose = False)
+        for _ in xrange(20):
+            RM.rule(numberOfExtensions=1,verbose = False)
         
         #the kernel has ben created
         assert D["ker_(f)"] is not None
@@ -457,9 +457,8 @@ class AbelianExactnessTest(unittest.TestCase):
         Exact(f,g)
         Rules = AbelianRules+[ComposeRule,ExistIdentity]
         RM = RuleMaster(D,Rules = Rules, prioritiser = UltimateWeightPriotiser)
-        for _ in xrange(60):
+        for _ in xrange(40):
             RM.rule(numberOfExtensions=1,verbose = False)
-        
         
         pcoker_f = getCokernel(f)
         iker_g = getKernel(g)
@@ -470,4 +469,4 @@ class AbelianExactnessTest(unittest.TestCase):
         
         psi = next(iterNonZeroMorphisms(ker_coker_f,ker_g))
         assert isIsomorphism(psi)
-        reprWithoutZeros(D)
+        #print  reprWithoutZeros(D)

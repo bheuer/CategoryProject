@@ -99,15 +99,15 @@ class Diagram(object):
                     self.unify(morph,newmorph)
                 #otherwise add and set equal, but be aware of infinite recursion by cycles.
                 #this is not exhausstive, but it hardcodes avodiing cycles
-                elif len(newmorph.Composition)<=len(morph.Composition) or not isCyclic(newmorph):
-                    if isMorphismZero(partial_m2):
-                        if not isMorphismZero(morph):
-                            self.unify(morph,GiveZeroMorphism(source,target))
-                    else:
-                        
-                        newmorph = Morphism([end,partial_m2,start])
-                        self.unify(morph,newmorph)
+                elif isMorphismZero(partial_m2):
+                    if not isMorphismZero(morph):
+                        self.unify(morph,GiveZeroMorphism(source,target))
                 
+                elif len(newmorph.Composition)<=len(morph.Composition) or not isCyclic(newmorph):
+                    
+                    newmorph = Morphism([end,partial_m2,start])
+                    self.unify(morph,newmorph)
+            
                 
     def addProperty(self,prop):
         self.Properties.append(prop)
@@ -149,7 +149,6 @@ class Diagram(object):
     
     def commutes(self,morphism1,morphism2):
         #treats morph1,morph2 as technically different morphisms and asks if they are known to commute
-        
         if not self.CommutativityQuotient.is_defined_on_edge(morphism1) or not self.CommutativityQuotient.is_defined_on_edge(morphism2):
             #morphisms not known => were not added by the user or by a rule => internal investigation going on
             return False
