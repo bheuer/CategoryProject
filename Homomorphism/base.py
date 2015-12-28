@@ -110,7 +110,7 @@ class Homomorphism:
         str_+= "| Nodes:\n"
         for obj in self.D1.Objects:
             image = self.nodeMap.get(obj)
-            if image.name == obj.name == "0":
+            if image is None or image.name == obj.name == "0":
                 continue
             str_+="|  {} -> {}\n".format(obj, self.nodeMap.get(obj))
         str_+="| Edges:\n"

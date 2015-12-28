@@ -8,8 +8,9 @@ import unittest
 from Property.TestPrioritiser import CustomRuleWeight_MaxObjectPlusMaxMorphismPrioritiser
 from Solver.Prioritiser import UltimateWeightPriotiser
 from Rule import EpimorphismRule, MonomorphismRule, ExistIdentity,\
-    ProductRuleUnique, CoProductRuleUnique, FibreProductRuleUnique, FibreProductRule, AbelianRules
+    ProductRuleUnique, CoProductRuleUnique, FibreProductRuleUnique, FibreProductRule, AbelianRules, GenericRules
 from Rule.Compose import ComposeRule
 from Rule.abelianProperty import AbelianCategory, Kernel, GiveZeroMorphism,isMorphismZero,\
     Exact, reprWithoutZeros, getCokernel, getKernel, iterNonZeroMorphisms,\
     isIsomorphism
+from IO import *
