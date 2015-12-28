@@ -8,11 +8,13 @@ import unittest
 from Property.TestPrioritiser import CustomRuleWeight_MaxObjectPlusMaxMorphismPrioritiser
 from Solver.Prioritiser import UltimateWeightPriotiser
 from Rule import EpimorphismRule, MonomorphismRule, ExistIdentity,\
-    ProductRuleUnique, CoProductRuleUnique, FibreProductRuleUnique, FibreProductRule, AbelianRules
+    ProductRuleUnique, CoProductRuleUnique, FibreProductRuleUnique, FibreProductRule, AbelianRules,\
+    GenericRules
 from Rule.Compose import ComposeRule
 from Rule.abelianProperty import AbelianCategory, Kernel, GiveZeroMorphism,isMorphismZero,\
     Exact, reprWithoutZeros, getCokernel, getKernel, iterNonZeroMorphisms,\
     isIsomorphism
+from Rule.rule import ProductRule
 
 class CompositionTestCase(unittest.TestCase):
     def runTest(self):
@@ -365,9 +367,9 @@ class RuleMasterTest(unittest.TestCase):
         pi2_ = Morphism(BxA,B,"pi2_")
         ProductProperty(pi1,pi2)
         ProductProperty(pi1_,pi2_)
+        RM = RuleMaster(D,prioritiser = UltimateWeightPriotiser,Rules = [ExistIdentity,ProductRule,ProductRuleUnique,ComposeRule])
         
-        RM = RuleMaster(D,prioritiser = UltimateWeightPriotiser)
-        RM.rule_exhaustively(numberOfExtensions=2)
+        RM.rule_exhaustively(numberOfExtensions=1)
         
         assert D["m2*m1"]==D["id_BxA"]
         assert D["m1*m2"]==D["id_AxB"]
@@ -455,7 +457,8 @@ class AbelianExactnessTest(unittest.TestCase):
         g = Morphism(B,C,"g")
         
         Exact(f,g)
-        Rules = AbelianRules+[ComposeRule,ExistIdentity]
+        
+        Rules = AbelianRules
         RM = RuleMaster(D,Rules = Rules, prioritiser = UltimateWeightPriotiser)
         for _ in xrange(40):
             RM.rule(numberOfExtensions=1,verbose = False)
