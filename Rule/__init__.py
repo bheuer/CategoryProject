@@ -5,7 +5,9 @@ from abelianProperty import *
 from abelianRules import *
 import rule
 import abelianRules
+from Rule.Compose import ComposeRule
 
+GenericRules = [ComposeRule]
 for name, cls in inspect.getmembers(rule):
     if inspect.isclass(cls) and issubclass(cls, RuleGenerator):
         if cls is RuleGenerator:
@@ -17,8 +19,14 @@ for name, cls in inspect.getmembers(rule):
                 clsname = clsname[:-9]
         
         exec(clsname+"= cls()()")
+        rule = eval(clsname)
+        if rule.generic:#holds in arbitrary Categories
+            GenericRules.append(rule)
 
-AbelianRules = []
+AbelianRules = [ComposeRule] #don't add GenericRules
+try:AbelianRules.append(ExistIdentity)
+except NameError:pass
+
 for name, cls in inspect.getmembers(abelianRules):
     if inspect.isclass(cls) and issubclass(cls, RuleGenerator):
         if cls is RuleGenerator:

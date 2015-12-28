@@ -12,6 +12,7 @@ class ExistIdentityGenerator(RuleGenerator):
         Isomorphism(i)
 
 class ExistProductGenerator(RuleGenerator):
+    generic = False #this rule doesn't hold in arbitrary categories
     def CharacteristicDiagram(self,CD):
         self.A = Object(CD,"A")
         self.B = Object(CD,"B")

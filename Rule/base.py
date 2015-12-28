@@ -5,6 +5,7 @@ from Diagram import Diagram,Category,GenericCategory
 class RuleGenerator:
     RuleName = None
     category = GenericCategory
+    generic = True
     def __init__(self):
         self.CD = Diagram(self.category)
         self.Extension = Diagram(self.category)
@@ -28,6 +29,7 @@ class RuleGenerator:
     
     def __call__(self):
         rule = Rule(self.CD,self.Extension,name = self.RuleName)
+        rule.generic = self.generic
         for o in self.CD.Objects:
             rule.set_node_image(o,self.Extension[o.name])
         for e in self.CD.MorphismList:
@@ -37,6 +39,7 @@ class RuleGenerator:
 
 #abstract base class
 class Rule(Homomorphism):
+    generic = False
     def __init__(self,D1,D2,name):
         Homomorphism.__init__(self,D1,D2)
         self.partialInverse = Homomorphism(D2,D1)
