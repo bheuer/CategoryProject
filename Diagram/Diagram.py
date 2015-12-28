@@ -190,7 +190,7 @@ class Diagram(object):
             print quot
     
     def __repr__(self):
-        str_ = "Diagram with the following data"
+        str_ = "Diagram with the following data\n"
         str_+= "| Objects:\n| "
         str_+="\n| ".join(str(o) for o in self.Objects)
         str_+="\n\n| Morphisms by Commutativity class:\n| "
