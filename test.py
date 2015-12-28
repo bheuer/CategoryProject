@@ -259,7 +259,7 @@ class ProductTestCase(unittest.TestCase):
       
         ProductProperty(pi1,pi2)
         
-        RM = RuleMaster(D,Rules = [ProductRuleUnique])
+        RM = RuleMaster(D)
         
         Commute(pi2*f,pi2*g)
         RM.rule_exhaustively()
